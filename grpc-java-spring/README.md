@@ -11,6 +11,7 @@ grpc-java-starter
 6. 错误处理:超时、未捕捉异常等错误。
 7. 老版本兼容：增加或删除一个字段，增加或删除一个方法。
 8. 有哪些已知的坑,提前规避。
+9. 基本使用，同步/异步、单向双向
 
 我想做成什么样：
 1. 首先是根据项目需要来，先满足项目要求。先满足基本使用，并配合Spring使用，这是我们项目的基本要求。
@@ -23,6 +24,33 @@ grpc-java-starter
 
 
 # Usage
+
+## config
+## Custom gRPC Server Configuration
+
+哪些东西可配置，配置的入口和方式是什么，考虑以后做Spring boot版本如何快速Auto Configuration
+port
+ssl
+Interceptor
+logger：java.util.logging.Logger
+
+
+errorhandling
+manualflowcontrol
+
+HeaderServerInterceptor
+HeaderClientInterceptor
+认证和授权(统一的接口，可选是否启用认证，以及可选认证方式，比如basic、jwt)
+
+diff in-process and netty server
+
+to many dependency
+
+client sdk
+
+thread safe
+
+mock test
 
 
 # Contributing
