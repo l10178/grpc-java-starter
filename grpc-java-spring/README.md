@@ -52,6 +52,8 @@ thread safe
 
 mock test
 
+howto enable ProtoReflectionService
+
 
 # Contributing
 
