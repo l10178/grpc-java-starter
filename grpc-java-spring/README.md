@@ -61,3 +61,4 @@ howto enable ProtoReflectionService
 
 [salesforce/grpc-java-contrib](https://github.com/salesforce/grpc-java-contrib)
 [yidongnan/grpc-spring-boot-starter](https://github.com/yidongnan/grpc-spring-boot-starter)
+[LogNet/grpc-spring-boot-starter](https://github.com/LogNet/grpc-spring-boot-starter)
