@@ -1,4 +1,4 @@
-package com.nxest.grpc.spring.context;
+package com.nxest.grpc.spring.server;
 
 import io.grpc.Server;
 import org.springframework.context.ApplicationEvent;

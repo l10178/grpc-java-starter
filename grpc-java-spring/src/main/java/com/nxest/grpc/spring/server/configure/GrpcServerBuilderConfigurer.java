@@ -1,4 +1,4 @@
-package com.nxest.grpc.spring.configure;
+package com.nxest.grpc.spring.server.configure;
 
 import io.grpc.ServerBuilder;
 

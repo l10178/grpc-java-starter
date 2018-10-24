@@ -1,6 +1,6 @@
-package com.nxest.grpc.spring.test.config;
+package com.nxest.grpc.spring.test.server.config;
 
-import com.nxest.grpc.spring.configure.GrpcServerProperties;
+import com.nxest.grpc.spring.server.configure.GrpcServerProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 

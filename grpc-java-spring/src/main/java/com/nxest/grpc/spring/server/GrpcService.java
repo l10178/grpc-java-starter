@@ -1,4 +1,4 @@
-package com.nxest.grpc.spring;
+package com.nxest.grpc.spring.server;
 
 import org.springframework.stereotype.Service;
 

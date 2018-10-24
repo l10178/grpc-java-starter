@@ -1,7 +1,6 @@
-package com.nxest.grpc.spring.test.config;
+package com.nxest.grpc.spring.test.server.config;
 
-import com.nxest.grpc.spring.GrpcServerRunner;
-import com.nxest.grpc.spring.configure.GrpcServerProperties;
+import com.nxest.grpc.spring.server.GrpcServerRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,6 +16,11 @@ public class GrpcServerConfiguration {
     public GrpcServerRunner serverRunner() {
         GrpcServerRunner runner = new GrpcServerRunner();
         runner.setGrpcServerProperties(grpcProperties.getServer());
+//        try {
+//            runner.start();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         return runner;
     }
 }

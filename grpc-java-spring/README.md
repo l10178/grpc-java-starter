@@ -44,15 +44,40 @@ HeaderClientInterceptor
 
 diff in-process and netty server
 
-to many dependency
-
-client sdk
+client sdk,客户端和服务端分开吗
 
 thread safe
 
-mock test
+mock testroute
 
 howto enable ProtoReflectionService
+
+
+客户端连接
+1、全局配置
+2、获取serverChannel
+3、获取stub
+4、发送
+5、多server配置
+6、如果server的IP、端口如果是动态的，如何。先满足单连接，静态IP端口
+
+
+
+
+Why not spring-boot-starter
+1. 别人已经有了。
+2. 我们的项目太老了，没有spring boot，还是xml配置文件。
+3. 想用在Spring Boot项目中也并不难，尽力做到用起来简单，全部都有默认项。
+
+
+//TODO:spring info 提示，bug:注入的chanel可能为null
+ : Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@1a72a540: startup date [Wed Oct 24 14:57:17 CST 2018]; root of context hierarchy
+2018-10-24 14:57:17.782  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'grpcClientConfiguration' of type [com.nxest.grpc.spring.test.client.config.GrpcClientConfiguration$$EnhancerBySpringCGLIB$$8cb55dc8] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2018-10-24 14:57:17.821  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'grpcChannelsProperties' of type [com.nxest.grpc.spring.client.configure.GrpcChannelsProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2018-10-24 14:57:17.825  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'grpcLoadBalancerFactory' of type [io.grpc.util.RoundRobinLoadBalancerFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2018-10-24 14:57:17.830  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'globalClientInterceptorRegistry' of type [com.nxest.grpc.spring.client.GlobalClientInterceptorRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2018-10-24 14:57:17.836  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'addressChannelFactory' of type [com.nxest.grpc.spring.client.AddressChannelFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2018-10-24 14:57:18.063  INFO 31200 --- [           main] c.n.grpc.spring.server.GrpcServerRunner  : Starting gRPC Server ...
 
 
 # Contributing

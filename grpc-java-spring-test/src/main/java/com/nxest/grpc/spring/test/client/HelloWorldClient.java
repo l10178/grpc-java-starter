@@ -3,27 +3,52 @@ package com.nxest.grpc.spring.test.client;
 import com.nxest.grpc.GreeterGrpc;
 import com.nxest.grpc.HelloRequest;
 import com.nxest.grpc.HelloResponse;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import com.nxest.grpc.spring.client.GrpcChannelFactory;
+import com.nxest.grpc.spring.client.GrpcClient;
+import io.grpc.Channel;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+@Component
 public class HelloWorldClient {
 
+    @GrpcClient
+    private Channel channel;
 
-    public static void main(String[] args) throws InterruptedException {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 6500)
-            .usePlaintext()
-            .build();
+    @Resource
+    private GrpcChannelFactory grpcChannelFactory;
 
-        GreeterGrpc.GreeterBlockingStub stub =
-            GreeterGrpc.newBlockingStub(channel);
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
-        HelloResponse helloResponse = stub.sayHello(
-            HelloRequest.newBuilder()
-                .setName("Ray")
-                .build());
+    @PostConstruct
+    public void start() {
+        executorService.scheduleWithFixedDelay(this::test, 2, 2, TimeUnit.SECONDS);
+        Channel aDefault = grpcChannelFactory.createChannel("default");
+        System.out.println(aDefault);
 
-        System.out.println(helloResponse);
-
-        channel.shutdown();
     }
+
+    private void test() {
+        try {
+            GreeterGrpc.GreeterBlockingStub stub = GreeterGrpc.newBlockingStub(channel);
+
+            HelloResponse helloResponse = stub.sayHello(
+                HelloRequest.newBuilder()
+                    .setName("nxest")
+                    .build());
+
+            System.out.println(helloResponse);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

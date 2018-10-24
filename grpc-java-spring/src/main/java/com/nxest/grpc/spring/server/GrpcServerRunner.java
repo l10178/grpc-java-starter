@@ -1,10 +1,9 @@
 
-package com.nxest.grpc.spring;
+package com.nxest.grpc.spring.server;
 
 import com.google.common.base.Preconditions;
-import com.nxest.grpc.spring.configure.GrpcServerBuilderConfigurer;
-import com.nxest.grpc.spring.configure.GrpcServerProperties;
-import com.nxest.grpc.spring.context.GrpcServerInitializedEvent;
+import com.nxest.grpc.spring.server.configure.GrpcServerBuilderConfigurer;
+import com.nxest.grpc.spring.server.configure.GrpcServerProperties;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -105,7 +104,7 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
             this.serverBuilderConfigurer = new GrpcServerBuilderConfigurer();
         }
         if (Objects.isNull(this.grpcServerProperties)) {
-            this.grpcServerProperties = new GrpcServerProperties();
+            this.grpcServerProperties = GrpcServerProperties.DEFAULT;
         }
     }
 

@@ -1,10 +1,10 @@
-package com.nxest.grpc.spring.test;
+package com.nxest.grpc.spring.test.server;
 
 
 import com.nxest.grpc.GreeterGrpc;
 import com.nxest.grpc.HelloRequest;
 import com.nxest.grpc.HelloResponse;
-import com.nxest.grpc.spring.GrpcService;
+import com.nxest.grpc.spring.server.GrpcService;
 import io.grpc.stub.StreamObserver;
 
 import javax.annotation.Resource;

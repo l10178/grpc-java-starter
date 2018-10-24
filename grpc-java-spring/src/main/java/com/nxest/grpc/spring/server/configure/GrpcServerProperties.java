@@ -1,9 +1,11 @@
-package com.nxest.grpc.spring.configure;
+package com.nxest.grpc.spring.server.configure;
 
 
 public class GrpcServerProperties {
 
-    public static final int DEFAULT_GRPC_PORT = 6565;
+    public static final int DEFAULT_GRPC_PORT = 6868;
+
+    public static final GrpcServerProperties DEFAULT = new GrpcServerProperties();
 
     /**
      * server port
