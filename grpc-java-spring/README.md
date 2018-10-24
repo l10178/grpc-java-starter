@@ -87,6 +87,7 @@ Netty 的 OpenSSL 有两种实现机制：Dynamic linked 和 Statically Linked�
 对于一些紧急的 OpenSSL 安全补丁，如果采用 Statically Linked 的方式，需要等待 Netty 社区提供新的静态编译补丁版本，可能会存在一定的滞后性。
 
 
+
 Why not spring-boot-starter
 1. 别人已经有了。
 2. 我们的项目太老了，没有spring boot，还是xml配置文件。
