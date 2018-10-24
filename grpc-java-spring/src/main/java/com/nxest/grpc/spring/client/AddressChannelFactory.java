@@ -3,7 +3,6 @@ package com.nxest.grpc.spring.client;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.nxest.grpc.spring.client.configure.GrpcChannelProperties;
-import com.nxest.grpc.spring.client.configure.GrpcChannelsProperties;
 import io.grpc.*;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 
@@ -12,12 +11,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class AddressChannelFactory implements GrpcChannelFactory {
-    private final GrpcChannelsProperties properties;
+    private final GrpcChannelProperties properties;
     private final LoadBalancer.Factory loadBalancerFactory;
     private final NameResolver.Factory nameResolverFactory;
     private final GlobalClientInterceptorRegistry globalClientInterceptorRegistry;
 
-    public AddressChannelFactory(GrpcChannelsProperties properties, LoadBalancer.Factory loadBalancerFactory, GlobalClientInterceptorRegistry globalClientInterceptorRegistry) {
+    public AddressChannelFactory(GrpcChannelProperties properties, LoadBalancer.Factory loadBalancerFactory, GlobalClientInterceptorRegistry globalClientInterceptorRegistry) {
         this.properties = properties;
         this.loadBalancerFactory = loadBalancerFactory;
         this.nameResolverFactory = new AddressChannelResolverFactory(properties);
@@ -31,7 +30,7 @@ public class AddressChannelFactory implements GrpcChannelFactory {
 
     @Override
     public Channel createChannel(String name, List<ClientInterceptor> interceptors) {
-        GrpcChannelProperties channelProperties = properties.getChannel(name);
+        GrpcChannelProperties channelProperties = properties;
         NettyChannelBuilder builder = NettyChannelBuilder.forTarget(name)
             .loadBalancerFactory(loadBalancerFactory)
             .nameResolverFactory(nameResolverFactory);

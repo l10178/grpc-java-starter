@@ -4,7 +4,7 @@ import java.net.URI;
 
 import javax.annotation.Nullable;
 
-import com.nxest.grpc.spring.client.configure.GrpcChannelsProperties;
+import com.nxest.grpc.spring.client.configure.GrpcChannelProperties;
 import io.grpc.Attributes;
 import io.grpc.NameResolver;
 import io.grpc.NameResolverProvider;
@@ -12,16 +12,16 @@ import io.grpc.internal.GrpcUtil;
 
 public class AddressChannelResolverFactory extends NameResolverProvider {
 
-    private final GrpcChannelsProperties properties;
+    private final GrpcChannelProperties properties;
 
-    public AddressChannelResolverFactory(GrpcChannelsProperties properties) {
+    public AddressChannelResolverFactory(GrpcChannelProperties properties) {
         this.properties = properties;
     }
 
     @Nullable
     @Override
     public NameResolver newNameResolver(URI targetUri, Attributes params) {
-        return new AddressChannelNameResolver(targetUri.toString(), properties.getChannel(targetUri.toString()), params, GrpcUtil.SHARED_CHANNEL_EXECUTOR);
+        return new AddressChannelNameResolver(targetUri.toString(), properties, params, GrpcUtil.SHARED_CHANNEL_EXECUTOR);
     }
 
     @Override

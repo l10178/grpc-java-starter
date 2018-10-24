@@ -6,12 +6,10 @@ import com.nxest.grpc.HelloResponse;
 import com.nxest.grpc.spring.client.GrpcChannelFactory;
 import com.nxest.grpc.spring.client.GrpcClient;
 import io.grpc.Channel;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
