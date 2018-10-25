@@ -19,7 +19,7 @@ public class GrpcClientConfiguration {
 
     //    @ConditionalOnMissingBean
     @Bean
-    public GrpcChannelProperties grpcChannelsProperties() {
+    public GrpcChannelProperties grpcChannelProperties() {
         return new GrpcChannelProperties();
     }
 
@@ -36,7 +36,7 @@ public class GrpcClientConfiguration {
 
     @Bean
     public GrpcChannelFactory addressChannelFactory() {
-        return new AddressChannelFactory(grpcChannelsProperties(), grpcLoadBalancerFactory(), globalClientInterceptorRegistry());
+        return new AddressChannelFactory(grpcChannelProperties(), grpcLoadBalancerFactory(), globalClientInterceptorRegistry());
     }
 
     @Bean
