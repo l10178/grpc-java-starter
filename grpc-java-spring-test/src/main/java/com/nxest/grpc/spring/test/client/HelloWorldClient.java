@@ -35,6 +35,7 @@ public class HelloWorldClient {
 
     private void test() {
         try {
+            //bug channel may be null
             GreeterGrpc.GreeterBlockingStub stub = GreeterGrpc.newBlockingStub(channel);
 
             HelloResponse helloResponse = stub.sayHello(
