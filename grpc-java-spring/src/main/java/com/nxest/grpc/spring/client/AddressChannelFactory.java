@@ -24,6 +24,11 @@ public class AddressChannelFactory implements GrpcChannelFactory {
     }
 
     @Override
+    public Channel createChannel() {
+        return this.createChannel(DEFAULT_CHANEL_NAME);
+    }
+
+    @Override
     public Channel createChannel(String name) {
         return this.createChannel(name, null);
     }

@@ -5,6 +5,7 @@ import com.nxest.grpc.spring.client.configure.GrpcChannelProperties;
 import com.nxest.grpc.spring.test.server.config.GrpcServerConfiguration;
 import io.grpc.LoadBalancer;
 import io.grpc.util.RoundRobinLoadBalancerFactory;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
@@ -40,7 +41,7 @@ public class GrpcClientConfiguration {
 
     @Bean
     @ConditionalOnClass(GrpcClient.class)
-    public GrpcClientBeanPostProcessor grpcClientBeanPostProcessor() {
-        return new GrpcClientBeanPostProcessor();
+    public GrpcClientBeanPostProcessor grpcClientBeanPostProcessor(ListableBeanFactory beanFactory, GrpcChannelFactory channelFactory) {
+        return new GrpcClientBeanPostProcessor(beanFactory, channelFactory);
     }
 }

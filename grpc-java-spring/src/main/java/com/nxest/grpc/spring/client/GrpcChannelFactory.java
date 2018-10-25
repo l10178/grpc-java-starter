@@ -9,7 +9,7 @@ public interface GrpcChannelFactory {
 
     String DEFAULT_CHANEL_NAME = "default";
 
-//    Channel createChannel();
+    Channel createChannel();
 
     Channel createChannel(String name);
 

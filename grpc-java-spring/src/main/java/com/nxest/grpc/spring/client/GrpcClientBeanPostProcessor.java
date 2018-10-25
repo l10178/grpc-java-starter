@@ -8,12 +8,11 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
-import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +22,13 @@ public class GrpcClientBeanPostProcessor implements BeanPostProcessor {
 
     private Map<String, List<Class>> beansToProcess = Maps.newHashMap();
 
-    @Resource
-    private DefaultListableBeanFactory beanFactory;
+    private ListableBeanFactory beanFactory;
 
-    @Resource
     private GrpcChannelFactory channelFactory;
 
-    public GrpcClientBeanPostProcessor() {
+    public GrpcClientBeanPostProcessor(ListableBeanFactory beanFactory, GrpcChannelFactory channelFactory) {
+        this.beanFactory = beanFactory;
+        this.channelFactory = channelFactory;
     }
 
     @Override
