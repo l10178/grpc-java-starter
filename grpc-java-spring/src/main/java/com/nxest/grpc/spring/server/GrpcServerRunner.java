@@ -4,10 +4,7 @@ package com.nxest.grpc.spring.server;
 import com.google.common.base.Preconditions;
 import com.nxest.grpc.spring.server.configure.GrpcServerBuilderConfigurer;
 import com.nxest.grpc.spring.server.configure.GrpcServerProperties;
-import io.grpc.BindableService;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import io.grpc.ServerServiceDefinition;
+import io.grpc.*;
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.shaded.io.netty.handler.ssl.ClientAuth;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
@@ -21,7 +18,6 @@ import javax.annotation.Nonnull;
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -30,7 +26,7 @@ import static java.lang.String.format;
 
 /**
  * {@code GrpcServerRunner} configures a gRPC {@link Server} with services obtained from the {@link ApplicationContext}
- * and manages that server's lifecycle. Services are discovered by finding {@link BindableService} implementations that
+ * and manages that server's lifecycle. Services are discovered by finding {@link GrpcService} implementations that
  * are annotated with {@link GrpcService}.
  */
 public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware, DisposableBean {
@@ -41,25 +37,21 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
 
     private volatile Server server;
 
-    private GrpcServerBuilderConfigurer serverBuilderConfigurer;
+    private final GrpcServerBuilderConfigurer serverBuilderConfigurer;
 
-    private GrpcServerProperties grpcServerProperties;
+    private final GrpcServerProperties grpcServerProperties;
 
     public GrpcServerRunner() {
+        this.serverBuilderConfigurer = new GrpcServerBuilderConfigurer();
+        this.grpcServerProperties = GrpcServerProperties.DEFAULT;
+    }
 
+    public GrpcServerRunner(GrpcServerProperties grpcServerProperties) {
+        this(new GrpcServerBuilderConfigurer(), grpcServerProperties);
     }
 
     public GrpcServerRunner(GrpcServerBuilderConfigurer serverBuilderConfigurer, GrpcServerProperties grpcServerProperties) {
         this.serverBuilderConfigurer = Preconditions.checkNotNull(serverBuilderConfigurer);
-        this.grpcServerProperties = Preconditions.checkNotNull(grpcServerProperties);
-    }
-
-
-    public void setServerBuilderConfigurer(GrpcServerBuilderConfigurer serverBuilderConfigurer) {
-        this.serverBuilderConfigurer = Preconditions.checkNotNull(serverBuilderConfigurer);
-    }
-
-    public void setGrpcServerProperties(GrpcServerProperties grpcServerProperties) {
         this.grpcServerProperties = Preconditions.checkNotNull(grpcServerProperties);
     }
 
@@ -71,8 +63,6 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
 
     public void start() throws Exception {
         logger.info("Starting gRPC Server ...");
-
-        initDefault();
 
         int port = grpcServerProperties.getPort();
 
@@ -97,15 +87,6 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
         applicationContext.publishEvent(new GrpcServerInitializedEvent(server));
         logger.info("gRPC Server started, listening on port " + port);
         blockUntilShutdown();
-    }
-
-    private void initDefault() {
-        if (Objects.isNull(this.serverBuilderConfigurer)) {
-            this.serverBuilderConfigurer = new GrpcServerBuilderConfigurer();
-        }
-        if (Objects.isNull(this.grpcServerProperties)) {
-            this.grpcServerProperties = GrpcServerProperties.DEFAULT;
-        }
     }
 
     private SslContextBuilder getSslContextBuilder() {
@@ -143,6 +124,7 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
 
     private Collection<BindableService> getServicesWithAnnotation() {
 
+
         Map<String, Object> possibleServices = applicationContext.getBeansWithAnnotation(GrpcService.class);
 
         Collection<String> invalidServiceNames = possibleServices.entrySet().stream()
@@ -164,11 +146,9 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
      */
     @Override
     public void close() {
-        final Server server = server();
         if (server != null) {
-            // Use stderr here since the logger may have been reset by its JVM shutdown hook.
 
-            System.err.println("Shutting down gRPC server ...");
+            logger.info("Shutting down gRPC server ...");
 
             server.shutdown();
 
@@ -180,16 +160,15 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
                 server.shutdownNow();
                 this.server = null;
             }
-            System.err.println("gRPC server stopped.");
+            logger.info("gRPC server stopped.");
         }
     }
 
+    /**
+     * Shutdown the gRPC {@link Server} when this object is closed.
+     */
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
         this.close();
-    }
-
-    private Server server() {
-        return server;
     }
 }

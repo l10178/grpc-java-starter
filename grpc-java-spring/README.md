@@ -28,8 +28,7 @@ grpc-java-starter
 ## config
 ## Custom gRPC Server Configuration
 
-哪些东西可配置，配置的入口和方式是什么，考虑以后做Spring boot版本如何快速Auto Configuration
-port
+哪些东西可配置，配置的入口和方式是什么
 ssl
 Interceptor
 logger：java.util.logging.Logger
@@ -51,6 +50,10 @@ thread safe
 mock testroute
 
 howto enable ProtoReflectionService
+
+GrpcServerInitializedEvent
+
+InProcessServerBuilder VS NettyServerBuilder
 
 
 客户端连接

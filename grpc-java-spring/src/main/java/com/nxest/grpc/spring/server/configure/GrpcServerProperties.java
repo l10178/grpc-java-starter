@@ -1,28 +1,24 @@
 package com.nxest.grpc.spring.server.configure;
 
-
+/**
+ * Grpc server properties
+ */
 public class GrpcServerProperties {
 
-    public static final int DEFAULT_GRPC_PORT = 6868;
+    /**
+     * Default grpc server port
+     */
+    public static final int DEFAULT_PORT = 6868;
 
+    /**
+     * The default  grpc server properties
+     */
     public static final GrpcServerProperties DEFAULT = new GrpcServerProperties();
 
     /**
      * server port
      */
-    private int port = DEFAULT_GRPC_PORT;
-
-    /**
-     * Enables the embedded grpc server.
-     */
-    private boolean enabled = true;
-
-
-    /**
-     * In process server name.
-     * If  the value is not empty, the embedded in-process server will be created and started.
-     */
-    private String inProcessServerName;
+    private int port = DEFAULT_PORT;
 
     /**
      * Enables server reflection using <a href="https://github.com/grpc/grpc-java/blob/master/documentation/server-reflection-tutorial.md">ProtoReflectionService</a>.
@@ -35,29 +31,12 @@ public class GrpcServerProperties {
      */
     private long shutdownDelayMillis = 1000L;
 
-
     public int getPort() {
         return port;
     }
 
     public void setPort(int port) {
         this.port = port;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getInProcessServerName() {
-        return inProcessServerName;
-    }
-
-    public void setInProcessServerName(String inProcessServerName) {
-        this.inProcessServerName = inProcessServerName;
     }
 
     public boolean isEnableReflection() {
