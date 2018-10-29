@@ -14,13 +14,6 @@ public class GrpcServerConfiguration {
 
     @Bean(name = "grpcServerRunner", initMethod = "start", destroyMethod = "destroy")
     public GrpcServerRunner serverRunner() {
-        GrpcServerRunner runner = new GrpcServerRunner();
-        runner.setGrpcServerProperties(grpcProperties.getServer());
-//        try {
-//            runner.start();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        return runner;
+        return new GrpcServerRunner(grpcProperties.getServer());
     }
 }

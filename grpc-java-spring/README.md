@@ -30,7 +30,7 @@ grpc-java-starter
 
 哪些东西可配置，配置的入口和方式是什么
 ssl
-Interceptor
+Interceptor: name and order, global interceptor or session interceptor
 logger：java.util.logging.Logger
 
 

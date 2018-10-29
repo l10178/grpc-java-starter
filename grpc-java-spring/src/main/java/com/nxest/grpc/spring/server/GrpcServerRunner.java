@@ -10,22 +10,25 @@ import io.grpc.netty.shaded.io.netty.handler.ssl.ClientAuth;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
 /**
- * {@code GrpcServerRunner} configures a gRPC {@link Server} with services obtained from the {@link ApplicationContext}
+ * {@code GrpcServerRunner} configures a grpc {@link Server} with services obtained from the {@link ApplicationContext}
  * and manages that server's lifecycle. Services are discovered by finding {@link GrpcService} implementations that
  * are annotated with {@link GrpcService}.
  */
@@ -56,37 +59,87 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
     }
 
     @Override
-    public void setApplicationContext(@Nonnull ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = Preconditions.checkNotNull(applicationContext);
     }
 
 
     public void start() throws Exception {
-        logger.info("Starting gRPC Server ...");
+        logger.info("Starting grpc Server ...");
 
         int port = grpcServerProperties.getPort();
 
         ServerBuilder serverBuilder = ServerBuilder.forPort(port);
 
-        // find and register all GRpcService-enabled beans
-        Collection<BindableService> services = getServicesWithAnnotation();
+        //server global interceptors
+        Stream<ServerInterceptor> serverInterceptors = getServerInterceptorsWithAnnotation();
 
-        for (BindableService srv : services) {
-            ServerServiceDefinition serviceDefinition = srv.bindService();
-            serverBuilder.addService(serviceDefinition);
-            logger.info(srv.getClass().getName() + " service has been registered.");
+        // find and register all GRpcService-enabled beans and bind interceptors
+        Map<String, Object> services = getServicesWithAnnotation();
+
+        for (Map.Entry<String, Object> service : services.entrySet()) {
+            BindableService srv = (BindableService) service.getValue();
+            GrpcService serviceAnn = applicationContext.findAnnotationOnBean(service.getKey(), GrpcService.class);
+            bindInterceptors(srv, serviceAnn, serverInterceptors);
+            serverBuilder.addService(srv);
+            logger.info(format("Grpc service %s has been registered.", srv.getClass().getName()));
         }
 
         //TODO:SSL/TLS supports
 
+        //custom server configure
         serverBuilderConfigurer.configure(serverBuilder);
         server = serverBuilder.build();
 
-
+        //start
         server.start();
         applicationContext.publishEvent(new GrpcServerInitializedEvent(server));
-        logger.info("gRPC Server started, listening on port " + port);
+        logger.info(format("Grpc server started, listening on port %s.", port));
+
+        //wait for stop
         blockUntilShutdown();
+    }
+
+    private Map<String, Object> getServicesWithAnnotation() {
+        Map<String, Object> possibleServices = applicationContext.getBeansWithAnnotation(GrpcService.class);
+
+        Collection<String> invalidServiceNames = possibleServices.entrySet().stream()
+            .filter(e -> !(e.getValue() instanceof BindableService))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+
+        if (!invalidServiceNames.isEmpty()) {
+            throw new IllegalStateException((format(
+                "The following beans are annotated with @GrpcService, but are not BindableServices: %s",
+                String.join(", ", invalidServiceNames))));
+        }
+        return possibleServices;
+    }
+
+
+    private void bindInterceptors(BindableService serviceDefinition, GrpcService serviceAnn, Stream<ServerInterceptor> globalInterceptors) {
+        Stream<? extends ServerInterceptor> privateInterceptors = Stream.of(serviceAnn.interceptors())
+            .map(interceptorClass -> {
+                try {
+                    return 0 < applicationContext.getBeanNamesForType(interceptorClass).length ?
+                        applicationContext.getBean(interceptorClass) :
+                        interceptorClass.newInstance();
+                } catch (Exception e) {
+                    throw new BeanCreationException("Failed to create interceptor instance.", e);
+                }
+            });
+
+        Stream<ServerInterceptor> global = serviceAnn.applyGlobalInterceptors() ? globalInterceptors : Stream.empty();
+        List<ServerInterceptor> interceptors = Stream.concat(global, privateInterceptors)
+            .distinct()
+            .sorted(AnnotationAwareOrderComparator.INSTANCE) ////Get service order and sort, support for spring @Order
+            .collect(Collectors.toList());
+
+        ServerInterceptors.intercept(serviceDefinition, interceptors);
+
+        List<String> interceptorNames = interceptors.stream().map(s -> s.getClass().getName()).collect(Collectors.toList());
+
+        logger.info(format("Grpc service %s bind interceptors: %s.", serviceDefinition.getClass().getName(), String.join(", ", interceptorNames)));
     }
 
     private SslContextBuilder getSslContextBuilder() {
@@ -115,57 +168,56 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
             try {
                 GrpcServerRunner.this.server.awaitTermination();
             } catch (InterruptedException e) {
-                logger.warning("gRPC server stopped." + e);
+                logger.warning("Grpc server stopped." + e);
             }
         });
         awaitThread.setDaemon(false);
         awaitThread.start();
     }
 
-    private Collection<BindableService> getServicesWithAnnotation() {
 
+    private Stream<ServerInterceptor> getServerInterceptorsWithAnnotation() {
+        Map<String, Object> possibleInterceptors = applicationContext.getBeansWithAnnotation(GrpcServerInterceptor.class);
 
-        Map<String, Object> possibleServices = applicationContext.getBeansWithAnnotation(GrpcService.class);
-
-        Collection<String> invalidServiceNames = possibleServices.entrySet().stream()
-            .filter(e -> !(e.getValue() instanceof BindableService))
+        Collection<String> invalidInterceptors = possibleInterceptors.entrySet().stream()
+            .filter(e -> !(e.getValue() instanceof ServerInterceptor))
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
 
-        if (!invalidServiceNames.isEmpty()) {
+        if (!invalidInterceptors.isEmpty()) {
             throw new IllegalStateException((format(
-                "The following beans are annotated with @GrpcService, but are not BindableServices: %s",
-                String.join(", ", invalidServiceNames))));
+                "The following beans are annotated with @GrpcServerInterceptor, but are not ServerInterceptor: %s",
+                String.join(", ", invalidInterceptors))));
         }
-
-        return possibleServices.values().stream().map(s -> (BindableService) s).collect(Collectors.toList());
+        return possibleInterceptors.values().stream()
+            .map(s -> (ServerInterceptor) s);
     }
 
     /**
-     * Shutdown the gRPC {@link Server} when this object is closed.
+     * Shutdown the grpc {@link Server} when this object is closed.
      */
     @Override
     public void close() {
         if (server != null) {
 
-            logger.info("Shutting down gRPC server ...");
+            logger.info("Shutting down grpc server ...");
 
             server.shutdown();
 
             try {
                 server.awaitTermination(grpcServerProperties.getShutdownDelayMillis(), TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
-                System.err.println("gRPC server stopped." + e);
+                logger.info("Grpc server stopped." + e);
             } finally {
                 server.shutdownNow();
                 this.server = null;
             }
-            logger.info("gRPC server stopped.");
+            logger.info("Grpc server stopped.");
         }
     }
 
     /**
-     * Shutdown the gRPC {@link Server} when this object is closed.
+     * Shutdown the grpc {@link Server} when this object is closed.
      */
     @Override
     public void destroy() {

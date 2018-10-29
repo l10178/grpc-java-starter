@@ -1,5 +1,6 @@
 package com.nxest.grpc.spring.server;
 
+import io.grpc.ServerInterceptor;
 import org.springframework.stereotype.Service;
 
 import java.lang.annotation.Documented;
@@ -24,4 +25,18 @@ public @interface GrpcService {
      * @return the suggested component name, if any
      */
     String value() default "";
+
+    /**
+     * custom server interceptors
+     *
+     * @return server interceptor classes
+     */
+    Class<? extends ServerInterceptor>[] interceptors() default {};
+
+    /**
+     * if need apply global interceptors
+     *
+     * @return if need apply global interceptors
+     */
+    boolean applyGlobalInterceptors() default true;
 }
