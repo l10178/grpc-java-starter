@@ -55,7 +55,7 @@ public class GrpcClientProperties {
      * (recommended), {@link NegotiationType#PLAINTEXT_UPGRADE PLAINTEXT_UPGRADE} or
      * {@link NegotiationType#PLAINTEXT PLAINTEXT}.
      */
-    private String negotiationType = NegotiationType.PLAINTEXT.toString();
+    private String negotiationType = NegotiationType.TLS.toString();
 
     /**
      * The cert chain file, eg. server.cer

@@ -9,6 +9,7 @@ import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.shaded.io.grpc.netty.NegotiationType;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
+import io.grpc.netty.shaded.io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.util.ResourceUtils;
 
 import javax.net.ssl.SSLException;
@@ -90,33 +91,32 @@ public class AddressChannelFactory implements GrpcChannelFactory {
             logger.info(format("Grpc client SSL/TLS privateKeyFile is %s.", certChainFile));
             SslContextBuilder sslContextBuilder = GrpcSslContexts.forClient();
 
-            boolean sslEnabled = false;
-
             if (trustCertCollectionFile != null) {
-                sslEnabled = true;
                 sslContextBuilder.trustManager(ResourceUtils.getFile(trustCertCollectionFile));
+            } else {
+                sslContextBuilder.trustManager(InsecureTrustManagerFactory.INSTANCE);
             }
+
             /*
              *Note: certChainFile and privateKeyFile are only needed if mutual auth is desired.
              *And if you specify certChainFile you must also specify privateKeyFile
              */
             if (certChainFile != null && privateKeyFile != null) {
-                sslEnabled = true;
                 sslContextBuilder.keyManager(ResourceUtils.getFile(certChainFile), ResourceUtils.getFile(privateKeyFile));
             }
 
             builder.sslContext(sslContextBuilder.build());
-            builder.negotiationType(negotiationType(sslEnabled));
+            builder.negotiationType(negotiationType());
         } catch (SSLException | FileNotFoundException e) {
             logger.warning("Failed init grpc client SSL/TLS." + e);
             throw new RuntimeException("Failed to init grpc server SSL/TLS.", e);
         }
     }
 
-    private NegotiationType negotiationType(boolean sslEnabled) {
+    private NegotiationType negotiationType() {
         String negotiationType = properties.getNegotiationType();
         if (Strings.isNullOrEmpty(negotiationType)) {
-            return sslEnabled ? NegotiationType.TLS : NegotiationType.PLAINTEXT;
+            return NegotiationType.TLS;
         }
         return NegotiationType.valueOf(negotiationType.toUpperCase());
     }

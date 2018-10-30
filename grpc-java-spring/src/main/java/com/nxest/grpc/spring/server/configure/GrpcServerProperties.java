@@ -32,6 +32,12 @@ public class GrpcServerProperties {
     private long shutdownDelayMillis = 1000L;
 
     /**
+     * Enables SSL/TLS
+     */
+    private boolean enableSsl = true;
+
+
+    /**
      * The cert chain file, eg. server.cer
      */
     private String certChainFile;
@@ -128,5 +134,13 @@ public class GrpcServerProperties {
 
     public void setClientAuth(String clientAuth) {
         this.clientAuth = clientAuth;
+    }
+
+    public boolean isEnableSsl() {
+        return enableSsl;
+    }
+
+    public void setEnableSsl(boolean enableSsl) {
+        this.enableSsl = enableSsl;
     }
 }

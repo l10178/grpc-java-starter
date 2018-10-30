@@ -14,6 +14,7 @@ import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.ClientAuth;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider;
+import io.grpc.netty.shaded.io.netty.handler.ssl.util.SelfSignedCertificate;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.DisposableBean;
@@ -24,6 +25,7 @@ import org.springframework.util.ResourceUtils;
 
 import javax.net.ssl.SSLException;
 import java.io.FileNotFoundException;
+import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +124,11 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
 
     private void initSslContext(NettyServerBuilder serverBuilder) {
 
+        if (!grpcServerProperties.isEnableSsl()) {
+            logger.warning("Grpc server SSL/TLS disabled. This is not recommended.");
+            return;
+        }
+
         try {
             logger.info("Begin init grpc server SSL/TLS.");
             String certChainFile = grpcServerProperties.getCertChainFile();
@@ -129,16 +136,18 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
             logger.info(format("Grpc server SSL/TLS certChainFile is %s.", certChainFile));
             logger.info(format("Grpc server SSL/TLS privateKeyFile is %s.", privateKeyFile));
 
-            //TODO Note: You only need to supply trustCertCollectionFilePath if you want to enable Mutual TLS.
+            SslContextBuilder sslClientContextBuilder;
             if (Strings.isNullOrEmpty(certChainFile) || Strings.isNullOrEmpty(certChainFile)) {
-                logger.warning("Grpc server SSL/TLS disabled. certChainFile or privateKeyFile  is empty.");
-                // return or throw
-                return;
+                logger.warning("Grpc server SSL/TLS certChainFile or privateKeyFile  is empty.");
+                logger.warning("Grpc server SSL/TLS use default SelfSignedCertificate.");
+                SelfSignedCertificate ssc = new SelfSignedCertificate();
+                sslClientContextBuilder = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey());
+            } else {
+                sslClientContextBuilder = SslContextBuilder.forServer(ResourceUtils.getFile(certChainFile),
+                    ResourceUtils.getFile(privateKeyFile));
             }
 
-            SslContextBuilder sslClientContextBuilder = SslContextBuilder.forServer(ResourceUtils.getFile(certChainFile),
-                ResourceUtils.getFile(privateKeyFile));
-
+            // You only need to supply trustCertCollectionFilePath if you want to enable Mutual TLS.
             String trustCertCollectionFile = grpcServerProperties.getTrustCertCollectionFile();
             logger.info(format("Grpc server SSL/TLS trustCertCollectionFile is %s.", trustCertCollectionFile));
 
@@ -146,11 +155,12 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
                 sslClientContextBuilder.trustManager(ResourceUtils.getFile(trustCertCollectionFile));
                 sslClientContextBuilder.clientAuth(clientAuth());
             }
+
             serverBuilder.sslContext(GrpcSslContexts.configure(sslClientContextBuilder, sslProvider()).build());
 
             logger.info("Success init grpc server SSL/TLS.");
 
-        } catch (SSLException | FileNotFoundException e) {
+        } catch (CertificateException | SSLException | FileNotFoundException e) {
             logger.warning("Failed init grpc server SSL/TLS." + e);
             throw new RuntimeException("Failed to init grpc server SSL/TLS.", e);
         }

@@ -21,7 +21,7 @@ public class GrpcClientConfiguration {
     @Bean
     public GrpcClientProperties grpcChannelProperties() {
         GrpcClientProperties grpcChannelProperties = new GrpcClientProperties();
-        grpcChannelProperties.setNegotiationType("TLS");
+//        grpcChannelProperties.setNegotiationType("TLS");
         return grpcChannelProperties;
     }
 
