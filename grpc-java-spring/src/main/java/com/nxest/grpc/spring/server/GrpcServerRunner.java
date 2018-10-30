@@ -16,7 +16,6 @@ import io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider;
 import io.grpc.netty.shaded.io.netty.handler.ssl.util.SelfSignedCertificate;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
@@ -40,7 +39,7 @@ import static java.lang.String.format;
  * and manages that server's lifecycle. Services are discovered by finding {@link GrpcService} implementations that
  * are annotated with {@link GrpcService}.
  */
-public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware, DisposableBean {
+public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware {
 
     private static final Logger logger = Logger.getLogger(GrpcServerRunner.class.getName());
 
@@ -71,13 +70,35 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
         this.applicationContext = Preconditions.checkNotNull(applicationContext);
     }
 
+    /**
+     * The main method, init and start the server
+     */
     public void start() {
         logger.info("Starting grpc Server ...");
 
-        int port = grpcServerProperties.getPort();
+        //init default server builder
+        NettyServerBuilder serverBuilder = NettyServerBuilder.forPort(grpcServerProperties.getPort());
 
-        NettyServerBuilder serverBuilder = NettyServerBuilder.forPort(port);
+        //find and bind services
+        bindService(serverBuilder);
 
+        //SSL/TLS supports
+        initSslContext(serverBuilder);
+
+        //add custom server configure
+        serverBuilderConfigurer.configure(serverBuilder);
+
+        //init the server
+        server = serverBuilder.build();
+
+        //start server
+        startServer();
+
+        //wait for stop
+        blockUntilShutdown();
+    }
+
+    private void bindService(NettyServerBuilder serverBuilder) {
         //server global interceptors
         Stream<ServerInterceptor> serverInterceptors = getServerInterceptorsWithAnnotation();
 
@@ -91,20 +112,6 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
             serverBuilder.addService(srv);
             logger.info(format("Grpc service %s has been registered.", srv.getClass().getName()));
         }
-
-        //SSL/TLS supports
-        initSslContext(serverBuilder);
-
-        //custom server configure
-        serverBuilderConfigurer.configure(serverBuilder);
-
-        server = serverBuilder.build();
-
-        //start
-        startServer();
-
-        //wait for stop
-        blockUntilShutdown();
     }
 
     private void startServer() {
@@ -112,7 +119,9 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
             server.start();
             // This can return -1 if there is no actual port or the result otherwise does not make sense.
             int port = server.getPort();
+            //fire event
             applicationContext.publishEvent(new GrpcServerInitializedEvent(server));
+
             logger.info(format("Grpc server started, listening on port %s.", port));
         } catch (Exception e) {
             logger.warning("Start server failed.");
@@ -136,8 +145,7 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
 
             SslContextBuilder sslClientContextBuilder;
             if (Strings.isNullOrEmpty(certChainFile) || Strings.isNullOrEmpty(certChainFile)) {
-                logger.warning("Grpc server SSL/TLS certChainFile or privateKeyFile  is empty.");
-                logger.warning("Grpc server SSL/TLS use default SelfSignedCertificate.");
+                logger.warning("Grpc server SSL/TLS certChainFile or privateKeyFile  is empty,use default SelfSignedCertificate.");
                 SelfSignedCertificate ssc = new SelfSignedCertificate();
                 sslClientContextBuilder = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey());
             } else {
@@ -201,6 +209,7 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
                 }
             });
 
+
         Stream<ServerInterceptor> global = serviceAnn.applyGlobalInterceptors() ? globalInterceptors : Stream.empty();
         List<ServerInterceptor> interceptors = Stream.concat(global, privateInterceptors)
             .distinct()
@@ -240,12 +249,13 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
                 "The following beans are annotated with @GrpcServerInterceptor, but are not ServerInterceptor: %s",
                 String.join(", ", invalidInterceptors))));
         }
+
         return possibleInterceptors.values().stream()
             .map(s -> (ServerInterceptor) s);
     }
 
     /**
-     * Shutdown the grpc {@link Server} when this object is closed.
+     * Shutdown the grpc {@link Server}
      */
     @Override
     public void close() {
@@ -265,9 +275,8 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
     }
 
     /**
-     * Shutdown the grpc {@link Server} when this object is closed.
+     * Shutdown the grpc {@link Server}
      */
-    @Override
     public void destroy() {
         this.close();
     }

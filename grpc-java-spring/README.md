@@ -44,7 +44,7 @@ diff in-process and netty server
 
 thread safe
 
-mock testroute
+mock test route
 
 how to enable ProtoReflectionService
 
