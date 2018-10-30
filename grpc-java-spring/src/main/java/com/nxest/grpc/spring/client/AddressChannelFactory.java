@@ -1,8 +1,6 @@
 package com.nxest.grpc.spring.client;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.nxest.grpc.spring.client.configure.GrpcClientProperties;
 import io.grpc.*;
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
@@ -10,14 +8,16 @@ import io.grpc.netty.shaded.io.grpc.netty.NegotiationType;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.util.ResourceUtils;
 
 import javax.net.ssl.SSLException;
 import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
@@ -28,13 +28,12 @@ public class AddressChannelFactory implements GrpcChannelFactory {
     private final GrpcClientProperties properties;
     private final LoadBalancer.Factory loadBalancerFactory;
     private final NameResolver.Factory nameResolverFactory;
-    private final GlobalClientInterceptorRegistry globalClientInterceptorRegistry;
 
-    public AddressChannelFactory(GrpcClientProperties properties, LoadBalancer.Factory loadBalancerFactory, GlobalClientInterceptorRegistry globalClientInterceptorRegistry) {
+
+    public AddressChannelFactory(GrpcClientProperties properties, LoadBalancer.Factory loadBalancerFactory) {
         this.properties = properties;
         this.loadBalancerFactory = loadBalancerFactory;
         this.nameResolverFactory = new AddressChannelResolverFactory(properties);
-        this.globalClientInterceptorRegistry = globalClientInterceptorRegistry;
     }
 
     @Override
@@ -52,9 +51,6 @@ public class AddressChannelFactory implements GrpcChannelFactory {
         NettyChannelBuilder builder = NettyChannelBuilder.forTarget(name)
             .loadBalancerFactory(loadBalancerFactory)
             .nameResolverFactory(nameResolverFactory);
-
-        builder.useTransportSecurity();
-
         initSsl(builder);
         if (properties.isEnableKeepAlive()) {
             builder.keepAliveWithoutCalls(properties.isKeepAliveWithoutCalls())
@@ -69,16 +65,14 @@ public class AddressChannelFactory implements GrpcChannelFactory {
         }
         Channel channel = builder.build();
 
-        List<ClientInterceptor> globalInterceptorList = globalClientInterceptorRegistry.getClientInterceptors();
-        //TODO: order interceptors
-        Set<ClientInterceptor> interceptorSet = Sets.newHashSet();
-        if (globalInterceptorList != null && !globalInterceptorList.isEmpty()) {
-            interceptorSet.addAll(globalInterceptorList);
-        }
-        if (interceptors != null && !interceptors.isEmpty()) {
-            interceptorSet.addAll(interceptors);
-        }
-        return ClientInterceptors.intercept(channel, Lists.newArrayList(interceptorSet));
+        //distinct and sort
+        Stream<ClientInterceptor> stream = (interceptors == null ? Stream.empty() : interceptors.stream());
+
+        List<ClientInterceptor> interceptorSet = stream
+            .distinct()
+            .sorted(AnnotationAwareOrderComparator.INSTANCE)
+            .collect(Collectors.toList());
+        return ClientInterceptors.intercept(channel, interceptorSet);
     }
 
     private void initSsl(NettyChannelBuilder builder) {

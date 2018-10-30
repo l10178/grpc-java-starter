@@ -44,4 +44,11 @@ public @interface GrpcClient {
      */
     Class<? extends ClientInterceptor>[] interceptors() default {};
 
+    /**
+     * if need apply global interceptors
+     *
+     * @return if need apply global interceptors
+     */
+    boolean applyGlobalInterceptors() default true;
+
 }

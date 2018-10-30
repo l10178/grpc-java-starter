@@ -26,8 +26,8 @@ public class GrpcClientConfiguration {
     }
 
     @Bean
-    public GlobalClientInterceptorRegistry globalClientInterceptorRegistry() {
-        return new GlobalClientInterceptorRegistry();
+    public ClientInterceptorRegistry globalClientInterceptorRegistry() {
+        return new ClientInterceptorRegistry();
     }
 
     //    @ConditionalOnMissingBean
@@ -38,12 +38,12 @@ public class GrpcClientConfiguration {
 
     @Bean
     public GrpcChannelFactory addressChannelFactory() {
-        return new AddressChannelFactory(grpcChannelProperties(), grpcLoadBalancerFactory(), globalClientInterceptorRegistry());
+        return new AddressChannelFactory(grpcChannelProperties(), grpcLoadBalancerFactory());
     }
 
     @Bean
     @ConditionalOnClass(GrpcClient.class)
-    public GrpcClientBeanPostProcessor grpcClientBeanPostProcessor(ListableBeanFactory beanFactory, GrpcChannelFactory channelFactory) {
-        return new GrpcClientBeanPostProcessor(beanFactory, channelFactory);
+    public GrpcClientBeanPostProcessor grpcClientBeanPostProcessor(GrpcChannelFactory channelFactory, ClientInterceptorRegistry clientInterceptorRegistry) {
+        return new GrpcClientBeanPostProcessor(channelFactory, clientInterceptorRegistry);
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
@@ -22,13 +21,13 @@ public class GrpcClientBeanPostProcessor implements BeanPostProcessor {
 
     private Map<String, List<Class>> beansToProcess = Maps.newHashMap();
 
-    private ListableBeanFactory beanFactory;
-
     private GrpcChannelFactory channelFactory;
 
-    public GrpcClientBeanPostProcessor(ListableBeanFactory beanFactory, GrpcChannelFactory channelFactory) {
-        this.beanFactory = beanFactory;
+    private final ClientInterceptorRegistry clientInterceptorRegistry;
+
+    public GrpcClientBeanPostProcessor(GrpcChannelFactory channelFactory, ClientInterceptorRegistry clientInterceptorRegistry) {
         this.channelFactory = channelFactory;
+        this.clientInterceptorRegistry = clientInterceptorRegistry;
     }
 
     @Override
@@ -56,23 +55,24 @@ public class GrpcClientBeanPostProcessor implements BeanPostProcessor {
                 for (Field field : clazz.getDeclaredFields()) {
                     GrpcClient annotation = AnnotationUtils.getAnnotation(field, GrpcClient.class);
                     if (null != annotation) {
-
-                        List<ClientInterceptor> list = Lists.newArrayList();
+                        List<ClientInterceptor> clientInterceptors = Lists.newArrayList();
                         for (Class<? extends ClientInterceptor> clientInterceptorClass : annotation.interceptors()) {
-                            ClientInterceptor clientInterceptor;
-                            if (beanFactory.getBeanNamesForType(ClientInterceptor.class).length > 0) {
-                                clientInterceptor = beanFactory.getBean(clientInterceptorClass);
-                            } else {
+                            ClientInterceptor clientInterceptor = clientInterceptorRegistry.getClientInterceptorBean(clientInterceptorClass);
+                            if (clientInterceptor == null) {
                                 try {
                                     clientInterceptor = clientInterceptorClass.newInstance();
                                 } catch (Exception e) {
                                     throw new BeanCreationException("Failed to create interceptor instance", e);
                                 }
                             }
-                            list.add(clientInterceptor);
+                            clientInterceptors.add(clientInterceptor);
                         }
 
-                        Channel channel = channelFactory.createChannel(annotation.value(), list);
+                        if (annotation.applyGlobalInterceptors()) {
+                            clientInterceptors.addAll(clientInterceptorRegistry.getClientInterceptors());
+                        }
+
+                        Channel channel = channelFactory.createChannel(annotation.value(), clientInterceptors);
                         ReflectionUtils.makeAccessible(field);
                         ReflectionUtils.setField(field, target, channel);
                     }
