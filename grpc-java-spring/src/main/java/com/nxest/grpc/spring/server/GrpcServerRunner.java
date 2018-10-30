@@ -72,8 +72,7 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
         this.applicationContext = Preconditions.checkNotNull(applicationContext);
     }
 
-
-    public void start() throws Exception {
+    public void start() {
         logger.info("Starting grpc Server ...");
 
         int port = grpcServerProperties.getPort();
@@ -147,13 +146,13 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
                     ResourceUtils.getFile(privateKeyFile));
             }
 
-            // You only need to supply trustCertCollectionFilePath if you want to enable Mutual TLS.
+            // You only need to supply trustCertCollectionFile if you want to enable Mutual TLS.
             String trustCertCollectionFile = grpcServerProperties.getTrustCertCollectionFile();
             logger.info(format("Grpc server SSL/TLS trustCertCollectionFile is %s.", trustCertCollectionFile));
 
             if (!Strings.isNullOrEmpty(trustCertCollectionFile)) {
                 sslClientContextBuilder.trustManager(ResourceUtils.getFile(trustCertCollectionFile));
-                sslClientContextBuilder.clientAuth(clientAuth());
+                sslClientContextBuilder.clientAuth(ClientAuth.REQUIRE);
             }
 
             serverBuilder.sslContext(GrpcSslContexts.configure(sslClientContextBuilder, sslProvider()).build());
@@ -172,14 +171,6 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
             return SslProvider.OPENSSL;
         }
         return SslProvider.valueOf(sslProvider.toUpperCase());
-    }
-
-    private ClientAuth clientAuth() {
-        String clientAuth = grpcServerProperties.getClientAuth();
-        if (Strings.isNullOrEmpty(clientAuth)) {
-            return ClientAuth.REQUIRE;
-        }
-        return ClientAuth.valueOf(clientAuth.toUpperCase());
     }
 
     private Map<String, Object> getServicesWithAnnotation() {

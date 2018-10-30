@@ -62,16 +62,6 @@ public class GrpcServerProperties {
      */
     private String sslProvider = "openssl";
 
-    /**
-     * Client Auth, default 'require', see {@link io.grpc.netty.shaded.io.netty.handler.ssl.ClientAuth}
-     * <pre>
-     *   NONE,
-     *   OPTIONAL
-     *   REQUIRE
-     * </pre>
-     */
-    private String clientAuth = "require";
-
     public int getPort() {
         return port;
     }
@@ -126,14 +116,6 @@ public class GrpcServerProperties {
 
     public void setSslProvider(String sslProvider) {
         this.sslProvider = sslProvider;
-    }
-
-    public String getClientAuth() {
-        return clientAuth;
-    }
-
-    public void setClientAuth(String clientAuth) {
-        this.clientAuth = clientAuth;
     }
 
     public boolean isEnableSsl() {
