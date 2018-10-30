@@ -25,6 +25,10 @@ public class GrpcClientBeanPostProcessor implements BeanPostProcessor {
 
     private final ClientInterceptorRegistry clientInterceptorRegistry;
 
+    public GrpcClientBeanPostProcessor(ClientInterceptorRegistry clientInterceptorRegistry) {
+        this(new AddressChannelFactory(), clientInterceptorRegistry);
+    }
+
     public GrpcClientBeanPostProcessor(GrpcChannelFactory channelFactory, ClientInterceptorRegistry clientInterceptorRegistry) {
         this.channelFactory = channelFactory;
         this.clientInterceptorRegistry = clientInterceptorRegistry;
