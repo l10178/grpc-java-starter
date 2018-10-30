@@ -28,12 +28,11 @@ grpc-java-starter
 ## config
 ## Custom gRPC Server Configuration
 
-哪些东西可配置，配置的入口和方式是什么
+#### Roadmap
+
+logger：java.util.logging.Logger
 ssl
 Interceptor: name and order, global interceptor or session interceptor
-logger：java.util.logging.Logger
-
-
 errorhandling
 manualflowcontrol
 
@@ -49,9 +48,7 @@ thread safe
 
 mock testroute
 
-howto enable ProtoReflectionService
-
-GrpcServerInitializedEvent
+how to enable ProtoReflectionService
 
 InProcessServerBuilder VS NettyServerBuilder
 

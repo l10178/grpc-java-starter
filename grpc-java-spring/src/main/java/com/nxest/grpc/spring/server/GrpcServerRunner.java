@@ -3,7 +3,6 @@ package com.nxest.grpc.spring.server;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.nxest.grpc.spring.server.configure.GrpcServerBuilderConfigurer;
 import com.nxest.grpc.spring.server.configure.GrpcServerProperties;
 import io.grpc.BindableService;
 import io.grpc.Server;
@@ -251,11 +250,8 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
     @Override
     public void close() {
         if (server != null) {
-
             logger.info("Shutting down grpc server ...");
-
             server.shutdown();
-
             try {
                 server.awaitTermination(grpcServerProperties.getShutdownDelayMillis(), TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {

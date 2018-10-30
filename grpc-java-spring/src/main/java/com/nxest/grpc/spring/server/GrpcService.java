@@ -27,7 +27,7 @@ public @interface GrpcService {
     String value() default "";
 
     /**
-     * custom server interceptors
+     * private server interceptors
      *
      * @return server interceptor classes
      */
