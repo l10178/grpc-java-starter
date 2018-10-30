@@ -3,9 +3,6 @@ package com.nxest.grpc.spring.test.client.config;
 import com.nxest.grpc.spring.client.*;
 import com.nxest.grpc.spring.client.configure.GrpcClientProperties;
 import com.nxest.grpc.spring.test.server.config.GrpcServerConfiguration;
-import io.grpc.LoadBalancer;
-import io.grpc.util.RoundRobinLoadBalancerFactory;
-import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
@@ -30,15 +27,9 @@ public class GrpcClientConfiguration {
         return new ClientInterceptorRegistry();
     }
 
-    //    @ConditionalOnMissingBean
-    @Bean
-    public LoadBalancer.Factory grpcLoadBalancerFactory() {
-        return RoundRobinLoadBalancerFactory.getInstance();
-    }
-
     @Bean
     public GrpcChannelFactory addressChannelFactory() {
-        return new AddressChannelFactory(grpcChannelProperties(), grpcLoadBalancerFactory());
+        return new AddressChannelFactory(grpcChannelProperties());
     }
 
     @Bean

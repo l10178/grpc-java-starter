@@ -8,6 +8,7 @@ import io.grpc.netty.shaded.io.grpc.netty.NegotiationType;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import io.grpc.util.RoundRobinLoadBalancerFactory;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.util.ResourceUtils;
 
@@ -29,6 +30,13 @@ public class AddressChannelFactory implements GrpcChannelFactory {
     private final LoadBalancer.Factory loadBalancerFactory;
     private final NameResolver.Factory nameResolverFactory;
 
+    public AddressChannelFactory() {
+        this(GrpcClientProperties.DEFAULT, RoundRobinLoadBalancerFactory.getInstance());
+    }
+
+    public AddressChannelFactory(GrpcClientProperties properties) {
+        this(properties, RoundRobinLoadBalancerFactory.getInstance());
+    }
 
     public AddressChannelFactory(GrpcClientProperties properties, LoadBalancer.Factory loadBalancerFactory) {
         this.properties = properties;

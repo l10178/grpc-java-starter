@@ -32,7 +32,7 @@ grpc-java-starter
 
 logger：java.util.logging.Logger
 ssl
-Interceptor: name and order, global interceptor or session interceptor
+Interceptor: name and order, global or private
 errorhandling
 manualflowcontrol
 
@@ -41,8 +41,6 @@ HeaderClientInterceptor
 认证和授权(统一的接口，可选是否启用认证，以及可选认证方式，比如basic、jwt)
 
 diff in-process and netty server
-
-client sdk,客户端和服务端分开吗
 
 thread safe
 
