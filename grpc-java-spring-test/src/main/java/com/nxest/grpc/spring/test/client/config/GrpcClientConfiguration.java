@@ -23,18 +23,18 @@ public class GrpcClientConfiguration {
     }
 
     @Bean
-    public ClientInterceptorRegistry globalClientInterceptorRegistry() {
+    public ClientInterceptorRegistry clientInterceptorRegistry() {
         return new ClientInterceptorRegistry();
     }
 
     @Bean
-    public GrpcChannelFactory addressChannelFactory() {
+    public GrpcChannelFactory channelFactory() {
         return new AddressChannelFactory(grpcChannelProperties());
     }
 
     @Bean
     @ConditionalOnClass(GrpcClient.class)
-    public GrpcClientBeanPostProcessor grpcClientBeanPostProcessor(GrpcChannelFactory channelFactory, ClientInterceptorRegistry clientInterceptorRegistry) {
-        return new GrpcClientBeanPostProcessor(channelFactory, clientInterceptorRegistry);
+    public GrpcClientBeanPostProcessor grpcClientBeanPostProcessor() {
+        return new GrpcClientBeanPostProcessor(channelFactory(), clientInterceptorRegistry());
     }
 }
