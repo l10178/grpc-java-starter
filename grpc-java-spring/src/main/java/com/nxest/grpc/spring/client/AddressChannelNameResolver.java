@@ -2,7 +2,7 @@ package com.nxest.grpc.spring.client;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.nxest.grpc.spring.client.configure.GrpcChannelProperties;
+import com.nxest.grpc.spring.client.configure.GrpcClientProperties;
 import io.grpc.Attributes;
 import io.grpc.EquivalentAddressGroup;
 import io.grpc.NameResolver;
@@ -19,7 +19,7 @@ public class AddressChannelNameResolver extends NameResolver {
     private static final Logger logger = Logger.getLogger(AddressChannelNameResolver.class.getName());
 
     private final String name;
-    private final GrpcChannelProperties properties;
+    private final GrpcClientProperties properties;
 
     private final Attributes attributes;
 
@@ -33,7 +33,7 @@ public class AddressChannelNameResolver extends NameResolver {
     @GuardedBy("this")
     private Listener listener;
 
-    public AddressChannelNameResolver(String name, GrpcChannelProperties properties, Attributes attributes, SharedResourceHolder.Resource<ExecutorService> executorResource) {
+    public AddressChannelNameResolver(String name, GrpcClientProperties properties, Attributes attributes, SharedResourceHolder.Resource<ExecutorService> executorResource) {
         this.name = name;
         this.properties = properties;
         this.attributes = attributes;

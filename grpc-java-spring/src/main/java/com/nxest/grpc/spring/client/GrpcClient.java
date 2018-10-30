@@ -1,6 +1,6 @@
 package com.nxest.grpc.spring.client;
 
-import com.nxest.grpc.spring.client.configure.GrpcChannelProperties;
+import com.nxest.grpc.spring.client.configure.GrpcClientProperties;
 import io.grpc.Channel;
 import io.grpc.ClientInterceptor;
 import io.grpc.stub.AbstractStub;
@@ -18,7 +18,7 @@ import java.lang.annotation.*;
 public @interface GrpcClient {
 
     /**
-     * The name of the grpc client. This name will be used to get the {@link GrpcChannelProperties
+     * The name of the grpc client. This name will be used to get the {@link GrpcClientProperties
      * config options} for this client.
      *
      * <p>

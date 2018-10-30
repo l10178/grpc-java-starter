@@ -2,10 +2,15 @@
 package com.nxest.grpc.spring.server;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.nxest.grpc.spring.server.configure.GrpcServerBuilderConfigurer;
 import com.nxest.grpc.spring.server.configure.GrpcServerProperties;
-import io.grpc.*;
+import io.grpc.BindableService;
+import io.grpc.Server;
+import io.grpc.ServerInterceptor;
+import io.grpc.ServerInterceptors;
 import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.shaded.io.grpc.netty.NettyServerBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.ClientAuth;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider;
@@ -15,8 +20,10 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.util.ResourceUtils;
 
-import java.io.File;
+import javax.net.ssl.SSLException;
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +76,7 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
 
         int port = grpcServerProperties.getPort();
 
-        ServerBuilder serverBuilder = ServerBuilder.forPort(port);
+        NettyServerBuilder serverBuilder = NettyServerBuilder.forPort(port);
 
         //server global interceptors
         Stream<ServerInterceptor> serverInterceptors = getServerInterceptorsWithAnnotation();
@@ -85,19 +92,84 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
             logger.info(format("Grpc service %s has been registered.", srv.getClass().getName()));
         }
 
-        //TODO:SSL/TLS supports
+        //SSL/TLS supports
+        initSslContext(serverBuilder);
 
         //custom server configure
         serverBuilderConfigurer.configure(serverBuilder);
+
         server = serverBuilder.build();
 
         //start
-        server.start();
-        applicationContext.publishEvent(new GrpcServerInitializedEvent(server));
-        logger.info(format("Grpc server started, listening on port %s.", port));
+        startServer();
 
         //wait for stop
         blockUntilShutdown();
+    }
+
+    private void startServer() {
+        try {
+            server.start();
+            // This can return -1 if there is no actual port or the result otherwise does not make sense.
+            int port = server.getPort();
+            applicationContext.publishEvent(new GrpcServerInitializedEvent(server));
+            logger.info(format("Grpc server started, listening on port %s.", port));
+        } catch (Exception e) {
+            logger.warning("Start server failed.");
+            throw new RuntimeException("Start server failed.", e);
+        }
+    }
+
+    private void initSslContext(NettyServerBuilder serverBuilder) {
+
+        try {
+            logger.info("Begin init grpc server SSL/TLS.");
+            String certChainFile = grpcServerProperties.getCertChainFile();
+            String privateKeyFile = grpcServerProperties.getPrivateKeyFile();
+            logger.info(format("Grpc server SSL/TLS certChainFile is %s.", certChainFile));
+            logger.info(format("Grpc server SSL/TLS privateKeyFile is %s.", privateKeyFile));
+
+            //TODO Note: You only need to supply trustCertCollectionFilePath if you want to enable Mutual TLS.
+            if (Strings.isNullOrEmpty(certChainFile) || Strings.isNullOrEmpty(certChainFile)) {
+                logger.warning("Grpc server SSL/TLS disabled. certChainFile or privateKeyFile  is empty.");
+                // return or throw
+                return;
+            }
+
+            SslContextBuilder sslClientContextBuilder = SslContextBuilder.forServer(ResourceUtils.getFile(certChainFile),
+                ResourceUtils.getFile(privateKeyFile));
+
+            String trustCertCollectionFile = grpcServerProperties.getTrustCertCollectionFile();
+            logger.info(format("Grpc server SSL/TLS trustCertCollectionFile is %s.", trustCertCollectionFile));
+
+            if (!Strings.isNullOrEmpty(trustCertCollectionFile)) {
+                sslClientContextBuilder.trustManager(ResourceUtils.getFile(trustCertCollectionFile));
+                sslClientContextBuilder.clientAuth(clientAuth());
+            }
+            serverBuilder.sslContext(GrpcSslContexts.configure(sslClientContextBuilder, sslProvider()).build());
+
+            logger.info("Success init grpc server SSL/TLS.");
+
+        } catch (SSLException | FileNotFoundException e) {
+            logger.warning("Failed init grpc server SSL/TLS." + e);
+            throw new RuntimeException("Failed to init grpc server SSL/TLS.", e);
+        }
+    }
+
+    private SslProvider sslProvider() {
+        String sslProvider = grpcServerProperties.getSslProvider();
+        if (Strings.isNullOrEmpty(sslProvider)) {
+            return SslProvider.OPENSSL;
+        }
+        return SslProvider.valueOf(sslProvider.toUpperCase());
+    }
+
+    private ClientAuth clientAuth() {
+        String clientAuth = grpcServerProperties.getClientAuth();
+        if (Strings.isNullOrEmpty(clientAuth)) {
+            return ClientAuth.REQUIRE;
+        }
+        return ClientAuth.valueOf(clientAuth.toUpperCase());
     }
 
     private Map<String, Object> getServicesWithAnnotation() {
@@ -140,27 +212,6 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware,
         List<String> interceptorNames = interceptors.stream().map(s -> s.getClass().getName()).collect(Collectors.toList());
 
         logger.info(format("Grpc service %s bind interceptors: %s.", serviceDefinition.getClass().getName(), String.join(", ", interceptorNames)));
-    }
-
-    private SslContextBuilder getSslContextBuilder() {
-        //        Init SSL/TLS
-//        this.certChainFilePath = certChainFilePath;
-//        this.privateKeyFilePath = privateKeyFilePath;
-//        this.trustCertCollectionFilePath = trustCertCollectionFilePath;
-//        System.out.println(
-//            "USAGE: HelloWorldServerTls host port certChainFilePath privateKeyFilePath " +
-//                "[trustCertCollectionFilePath]\n  Note: You only need to supply trustCertCollectionFilePath if you want " +
-//                "to enable Mutual TLS.");
-        String certChainFilePath = "certChainFilePath";
-        String privateKeyFilePath = "privateKeyFilePath";
-        String trustCertCollectionFilePath = "trustCertCollectionFilePath";
-        SslContextBuilder sslClientContextBuilder = SslContextBuilder.forServer(new File(certChainFilePath),
-            new File(privateKeyFilePath));
-        if (trustCertCollectionFilePath != null) {
-            sslClientContextBuilder.trustManager(new File(trustCertCollectionFilePath));
-            sslClientContextBuilder.clientAuth(ClientAuth.REQUIRE);
-        }
-        return GrpcSslContexts.configure(sslClientContextBuilder, SslProvider.OPENSSL);
     }
 
     private void blockUntilShutdown() {

@@ -16,7 +16,7 @@ public class GrpcServerProperties {
     public static final GrpcServerProperties DEFAULT = new GrpcServerProperties();
 
     /**
-     * server port
+     * Server port
      */
     private int port = DEFAULT_PORT;
 
@@ -27,9 +27,44 @@ public class GrpcServerProperties {
     private boolean enableReflection = false;
 
     /**
-     * await server termination MILLISECONDS
+     * Await server termination MILLISECONDS
      */
     private long shutdownDelayMillis = 1000L;
+
+    /**
+     * The cert chain file, eg. server.cer
+     */
+    private String certChainFile;
+
+    /**
+     * The private key file, eg. server.key
+     */
+    private String privateKeyFile;
+
+    /**
+     * The trust cert collection file, eg. ca.crt
+     */
+    private String trustCertCollectionFile;
+
+    /**
+     * SSL Provider, default 'openssl', see {@link io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider}
+     * <pre>
+     *     JDK
+     *     OPENSSL
+     *     OPENSSL_REFCNT
+     * </pre>
+     */
+    private String sslProvider = "openssl";
+
+    /**
+     * Client Auth, default 'require', see {@link io.grpc.netty.shaded.io.netty.handler.ssl.ClientAuth}
+     * <pre>
+     *   NONE,
+     *   OPTIONAL
+     *   REQUIRE
+     * </pre>
+     */
+    private String clientAuth = "require";
 
     public int getPort() {
         return port;
@@ -53,5 +88,45 @@ public class GrpcServerProperties {
 
     public void setShutdownDelayMillis(long shutdownDelayMillis) {
         this.shutdownDelayMillis = shutdownDelayMillis;
+    }
+
+    public String getCertChainFile() {
+        return certChainFile;
+    }
+
+    public void setCertChainFile(String certChainFile) {
+        this.certChainFile = certChainFile;
+    }
+
+    public String getPrivateKeyFile() {
+        return privateKeyFile;
+    }
+
+    public void setPrivateKeyFile(String privateKeyFile) {
+        this.privateKeyFile = privateKeyFile;
+    }
+
+    public String getTrustCertCollectionFile() {
+        return trustCertCollectionFile;
+    }
+
+    public void setTrustCertCollectionFile(String trustCertCollectionFile) {
+        this.trustCertCollectionFile = trustCertCollectionFile;
+    }
+
+    public String getSslProvider() {
+        return sslProvider;
+    }
+
+    public void setSslProvider(String sslProvider) {
+        this.sslProvider = sslProvider;
+    }
+
+    public String getClientAuth() {
+        return clientAuth;
+    }
+
+    public void setClientAuth(String clientAuth) {
+        this.clientAuth = clientAuth;
     }
 }

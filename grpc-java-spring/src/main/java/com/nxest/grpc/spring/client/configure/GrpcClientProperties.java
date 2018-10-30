@@ -3,12 +3,12 @@ package com.nxest.grpc.spring.client.configure;
 import io.grpc.internal.GrpcUtil;
 import io.grpc.netty.shaded.io.grpc.netty.NegotiationType;
 
-public class GrpcChannelProperties {
+public class GrpcClientProperties {
 
     public static final String DEFAULT_HOST = "127.0.0.1";
     public static final Integer DEFAULT_PORT = 6868;
 
-    public static final GrpcChannelProperties DEFAULT = new GrpcChannelProperties();
+    public static final GrpcClientProperties DEFAULT = new GrpcClientProperties();
 
     /**
      * host to connect to.
@@ -55,7 +55,27 @@ public class GrpcChannelProperties {
      * (recommended), {@link NegotiationType#PLAINTEXT_UPGRADE PLAINTEXT_UPGRADE} or
      * {@link NegotiationType#PLAINTEXT PLAINTEXT}.
      */
-    private NegotiationType negotiationType = NegotiationType.PLAINTEXT;
+    private String negotiationType = NegotiationType.PLAINTEXT.toString();
+
+    /**
+     * The cert chain file, eg. server.cer
+     * Note: certChainFile and privateKeyFile are only needed if mutual auth is desired.
+     * And if you specify certChainFile you must also specify privateKeyFile
+     */
+    private String certChainFile;
+
+    /**
+     * The private key file, eg. server.key
+     * Note: certChainFile and privateKeyFile are only needed if mutual auth is desired.
+     * And if you specify certChainFile you must also specify privateKeyFile
+     */
+    private String privateKeyFile;
+
+    /**
+     * The trust cert collection file, eg. ca.crt
+     */
+    private String trustCertCollectionFile;
+
 
     public String getHost() {
         return host;
@@ -121,11 +141,35 @@ public class GrpcChannelProperties {
         this.fullStreamDecompression = fullStreamDecompression;
     }
 
-    public NegotiationType getNegotiationType() {
+    public String getNegotiationType() {
         return negotiationType;
     }
 
-    public void setNegotiationType(NegotiationType negotiationType) {
+    public void setNegotiationType(String negotiationType) {
         this.negotiationType = negotiationType;
+    }
+
+    public String getCertChainFile() {
+        return certChainFile;
+    }
+
+    public void setCertChainFile(String certChainFile) {
+        this.certChainFile = certChainFile;
+    }
+
+    public String getPrivateKeyFile() {
+        return privateKeyFile;
+    }
+
+    public void setPrivateKeyFile(String privateKeyFile) {
+        this.privateKeyFile = privateKeyFile;
+    }
+
+    public String getTrustCertCollectionFile() {
+        return trustCertCollectionFile;
+    }
+
+    public void setTrustCertCollectionFile(String trustCertCollectionFile) {
+        this.trustCertCollectionFile = trustCertCollectionFile;
     }
 }

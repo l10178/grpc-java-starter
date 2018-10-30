@@ -1,7 +1,7 @@
 package com.nxest.grpc.spring.test.client.config;
 
 import com.nxest.grpc.spring.client.*;
-import com.nxest.grpc.spring.client.configure.GrpcChannelProperties;
+import com.nxest.grpc.spring.client.configure.GrpcClientProperties;
 import com.nxest.grpc.spring.test.server.config.GrpcServerConfiguration;
 import io.grpc.LoadBalancer;
 import io.grpc.util.RoundRobinLoadBalancerFactory;
@@ -19,8 +19,10 @@ public class GrpcClientConfiguration {
 
     //    @ConditionalOnMissingBean
     @Bean
-    public GrpcChannelProperties grpcChannelProperties() {
-        return new GrpcChannelProperties();
+    public GrpcClientProperties grpcChannelProperties() {
+        GrpcClientProperties grpcChannelProperties = new GrpcClientProperties();
+        grpcChannelProperties.setNegotiationType("TLS");
+        return grpcChannelProperties;
     }
 
     @Bean
