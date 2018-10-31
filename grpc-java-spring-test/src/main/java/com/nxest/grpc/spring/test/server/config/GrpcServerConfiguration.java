@@ -1,6 +1,7 @@
 package com.nxest.grpc.spring.test.server.config;
 
 import com.nxest.grpc.spring.server.GrpcServerRunner;
+import com.nxest.grpc.spring.test.config.GrpcProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

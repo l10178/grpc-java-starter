@@ -12,8 +12,7 @@ import io.grpc.util.RoundRobinLoadBalancerFactory;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.util.ResourceUtils;
 
-import javax.net.ssl.SSLException;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -94,7 +93,7 @@ public class AddressChannelFactory implements GrpcChannelFactory {
             SslContextBuilder sslContextBuilder = GrpcSslContexts.forClient();
 
             if (trustCertCollectionFile != null) {
-                sslContextBuilder.trustManager(ResourceUtils.getFile(trustCertCollectionFile));
+                sslContextBuilder.trustManager(ResourceUtils.getURL(trustCertCollectionFile).openStream());
             } else {
                 sslContextBuilder.trustManager(InsecureTrustManagerFactory.INSTANCE);
             }
@@ -104,12 +103,12 @@ public class AddressChannelFactory implements GrpcChannelFactory {
              *And if you specify certChainFile you must also specify privateKeyFile
              */
             if (certChainFile != null && privateKeyFile != null) {
-                sslContextBuilder.keyManager(ResourceUtils.getFile(certChainFile), ResourceUtils.getFile(privateKeyFile));
+                sslContextBuilder.keyManager(ResourceUtils.getURL(certChainFile).openStream(), ResourceUtils.getURL(privateKeyFile).openStream());
             }
 
             builder.sslContext(sslContextBuilder.build());
             builder.negotiationType(negotiationType());
-        } catch (SSLException | FileNotFoundException e) {
+        } catch (IOException e) {
             logger.warning("Failed init grpc client SSL/TLS." + e);
             throw new RuntimeException("Failed to init grpc server SSL/TLS.", e);
         }

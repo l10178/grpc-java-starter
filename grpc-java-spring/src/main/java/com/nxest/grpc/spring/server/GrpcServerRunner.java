@@ -21,8 +21,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.util.ResourceUtils;
 
-import javax.net.ssl.SSLException;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.List;
@@ -149,8 +148,8 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware 
                 SelfSignedCertificate ssc = new SelfSignedCertificate();
                 sslClientContextBuilder = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey());
             } else {
-                sslClientContextBuilder = SslContextBuilder.forServer(ResourceUtils.getFile(certChainFile),
-                    ResourceUtils.getFile(privateKeyFile));
+                sslClientContextBuilder = SslContextBuilder.forServer(ResourceUtils.getURL(certChainFile).openStream(),
+                    ResourceUtils.getURL(privateKeyFile).openStream());
             }
 
             // You only need to supply trustCertCollectionFile if you want to enable Mutual TLS.
@@ -158,7 +157,7 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware 
             logger.info(format("Grpc server SSL/TLS trustCertCollectionFile is %s.", trustCertCollectionFile));
 
             if (!Strings.isNullOrEmpty(trustCertCollectionFile)) {
-                sslClientContextBuilder.trustManager(ResourceUtils.getFile(trustCertCollectionFile));
+                sslClientContextBuilder.trustManager(ResourceUtils.getURL(trustCertCollectionFile).openStream());
                 sslClientContextBuilder.clientAuth(ClientAuth.REQUIRE);
             }
 
@@ -166,7 +165,7 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware 
 
             logger.info("Success init grpc server SSL/TLS.");
 
-        } catch (CertificateException | SSLException | FileNotFoundException e) {
+        } catch (CertificateException | IOException e) {
             logger.warning("Failed init grpc server SSL/TLS." + e);
             throw new RuntimeException("Failed to init grpc server SSL/TLS.", e);
         }

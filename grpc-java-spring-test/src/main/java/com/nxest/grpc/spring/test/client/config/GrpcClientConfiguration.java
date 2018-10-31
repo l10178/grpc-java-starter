@@ -2,11 +2,14 @@ package com.nxest.grpc.spring.test.client.config;
 
 import com.nxest.grpc.spring.client.*;
 import com.nxest.grpc.spring.client.configure.GrpcClientProperties;
+import com.nxest.grpc.spring.test.config.GrpcProperties;
 import com.nxest.grpc.spring.test.server.config.GrpcServerConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.Resource;
 
 @Configuration
 //@EnableConfigurationProperties
@@ -14,12 +17,12 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureAfter(GrpcServerConfiguration.class)
 public class GrpcClientConfiguration {
 
-    //    @ConditionalOnMissingBean
+    @Resource
+    private GrpcProperties grpcProperties;
+
     @Bean
     public GrpcClientProperties grpcChannelProperties() {
-        GrpcClientProperties grpcChannelProperties = new GrpcClientProperties();
-//        grpcChannelProperties.setNegotiationType("TLS");
-        return grpcChannelProperties;
+        return grpcProperties.getClient();
     }
 
     @Bean

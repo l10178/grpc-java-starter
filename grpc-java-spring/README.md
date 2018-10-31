@@ -50,6 +50,9 @@ how to enable ProtoReflectionService
 
 InProcessServerBuilder VS NettyServerBuilder
 
+Bug:
+1、ResourceUtils.getFile can not find file "classpath://"
+
 
 客户端连接
 1、全局配置

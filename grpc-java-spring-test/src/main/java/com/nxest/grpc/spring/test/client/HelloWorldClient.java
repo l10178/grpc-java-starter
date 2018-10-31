@@ -1,10 +1,10 @@
 package com.nxest.grpc.spring.test.client;
 
-import com.nxest.grpc.GreeterGrpc;
-import com.nxest.grpc.HelloRequest;
-import com.nxest.grpc.HelloResponse;
 import com.nxest.grpc.spring.client.GrpcChannelFactory;
 import com.nxest.grpc.spring.client.GrpcClient;
+import com.nxest.grpc.spring.test.GreeterGrpc;
+import com.nxest.grpc.spring.test.HelloRequest;
+import com.nxest.grpc.spring.test.HelloResponse;
 import io.grpc.Channel;
 import org.springframework.stereotype.Component;
 
