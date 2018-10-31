@@ -40,7 +40,7 @@ HeaderServerInterceptor
 HeaderClientInterceptor
 认证和授权(统一的接口，可选是否启用认证，以及可选认证方式，比如basic、jwt)
 
-diff in-process and netty server
+
 
 thread safe
 
@@ -48,11 +48,7 @@ mock test route
 
 how to enable ProtoReflectionService
 
-InProcessServerBuilder VS NettyServerBuilder
-
-Bug:
-1、ResourceUtils.getFile can not find file "classpath://"
-
+diff in-process and netty server InProcessServerBuilder VS NettyServerBuilder
 
 客户端连接
 1、全局配置
