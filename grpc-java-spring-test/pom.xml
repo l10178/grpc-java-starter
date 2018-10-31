@@ -107,18 +107,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--TODO:bug:package error-->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-compiler-plugin</artifactId>-->
-                <!--<version>3.8.0</version>-->
-                <!--<configuration>-->
-                    <!--<includes>-->
-                        <!--<include>src/main/proto</include>-->
-                        <!--<include>src/main/proto</include>-->
-                    <!--</includes>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
             <plugin>
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
