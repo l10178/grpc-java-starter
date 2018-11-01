@@ -36,8 +36,6 @@ SSL配置：三种文件差别，生成一个证书
 
 
 TODO:
-bug:channle is null
-bug:inject a stub
 
 
 #### Roadmap

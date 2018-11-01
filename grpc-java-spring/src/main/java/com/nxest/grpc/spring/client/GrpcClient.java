@@ -28,7 +28,7 @@ public @interface GrpcClient {
      *
      * @return The name of the grpc client.
      */
-    String value() default "default";
+    String value() default GrpcChannelFactory.DEFAULT_CHANEL_NAME;
 
     /**
      * A list of {@link ClientInterceptor}s that should be used with this client in addition to the
