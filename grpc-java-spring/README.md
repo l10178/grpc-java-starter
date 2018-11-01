@@ -1,5 +1,17 @@
 # grpc-java-starter
-grpc-java-starter
+Tools for automatically wiring up and starting a [gRPC][] service using Spring.
+
+## Features
+* Grpc Server: Configures and runs the embedded gRPC server with `@GrpcService` enabled beans as part of spring application. 
+* Grpc Client: Automatically creates and manages your grpc channels and stubs with `@GrpcClient`.
+* Supports global and custom gRPC server/client interceptors.
+
+
+## Usage
+
+### gRPC server
+
+
 
 # 前期考虑
 当我接触到这样一个全新的技术的时候，在考虑什么：
@@ -18,45 +30,29 @@ grpc-java-starter
 2. 看下别人做了什么，别人需要什么，尽可能通用，满足更多人的需求。
 3. GRPC有哪些常用配置。
 
-从这个项目中能获取什么：
-1. GRPC使用。
-2. 已经踩过的坑记录下来，前车之鉴。
+
+主要介绍
+SSL配置：三种文件差别，生成一个证书
 
 
-# Usage
+TODO:
+bug:channle is null
+bug:inject a stub
 
-## config
-## Custom gRPC Server Configuration
 
 #### Roadmap
 
-logger：java.util.logging.Logger
-ssl
-Interceptor: name and order, global or private
 errorhandling
 manualflowcontrol
-
-HeaderServerInterceptor
-HeaderClientInterceptor
 认证和授权(统一的接口，可选是否启用认证，以及可选认证方式，比如basic、jwt)
-
-
 
 thread safe
 
-mock test route
+mock test
 
 how to enable ProtoReflectionService
 
 diff in-process and netty server InProcessServerBuilder VS NettyServerBuilder
-
-客户端连接
-1、全局配置
-2、获取serverChannel
-3、获取stub
-4、发送
-5、多server配置
-6、如果server的IP、端口如果是动态的，如何。先满足单连接，静态IP端口
 
 
 https://grpc.io/docs/guides/auth.html
@@ -100,11 +96,17 @@ Why not spring-boot-starter
 2018-10-24 14:57:17.836  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'addressChannelFactory' of type [com.nxest.grpc.spring.client.AddressChannelFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
 2018-10-24 14:57:18.063  INFO 31200 --- [           main] c.n.grpc.spring.server.GrpcServerRunner  : Starting gRPC Server ...
 
+## Troubleshooting
 
-# Contributing
+## Thanks
+* [salesforce/grpc-java-contrib](https://github.com/salesforce/grpc-java-contrib)
+* [yidongnan/grpc-spring-boot-starter](https://github.com/yidongnan/grpc-spring-boot-starter)
+* [LogNet/grpc-spring-boot-starter](https://github.com/LogNet/grpc-spring-boot-starter)
 
-# Thanks
 
-[salesforce/grpc-java-contrib](https://github.com/salesforce/grpc-java-contrib)
-[yidongnan/grpc-spring-boot-starter](https://github.com/yidongnan/grpc-spring-boot-starter)
-[LogNet/grpc-spring-boot-starter](https://github.com/LogNet/grpc-spring-boot-starter)
+## License
+Licensed under [MIT][]. Copyright (c) 2018 [l10178][]
+
+[MIT]: https://opensource.org/licenses/MIT
+[l10178]: http://nxest.com/
+[gRPC]: https://grpc.io/

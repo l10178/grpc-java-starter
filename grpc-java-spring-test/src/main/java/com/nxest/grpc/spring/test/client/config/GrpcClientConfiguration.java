@@ -2,6 +2,7 @@ package com.nxest.grpc.spring.test.client.config;
 
 import com.nxest.grpc.spring.client.*;
 import com.nxest.grpc.spring.client.configure.GrpcClientProperties;
+import com.nxest.grpc.spring.server.GrpcServerRunner;
 import com.nxest.grpc.spring.test.config.GrpcProperties;
 import com.nxest.grpc.spring.test.server.config.GrpcServerConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -12,8 +13,6 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.Resource;
 
 @Configuration
-//@EnableConfigurationProperties
-//@ConditionalOnClass({GrpcChannelFactory.class})
 @AutoConfigureAfter(GrpcServerConfiguration.class)
 public class GrpcClientConfiguration {
 

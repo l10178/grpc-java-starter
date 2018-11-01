@@ -4,15 +4,20 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.grpc.Channel;
 import io.grpc.ClientInterceptor;
+import io.grpc.stub.AbstractStub;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.BeanInstantiationException;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,13 +77,32 @@ public class GrpcClientBeanPostProcessor implements BeanPostProcessor {
                             clientInterceptors.add(clientInterceptor);
                         }
 
+
                         if (annotation.applyGlobalInterceptors()) {
                             clientInterceptors.addAll(clientInterceptorRegistry.getClientInterceptors());
                         }
 
                         Channel channel = channelFactory.createChannel(annotation.value(), clientInterceptors);
+                        final Class<?> fieldType = field.getType();
+                        final Object value;
+                        if (Channel.class.equals(fieldType)) {
+                            value = channel;
+                        } else if (AbstractStub.class.isAssignableFrom(fieldType)) {
+                            try {
+                                Constructor<?> constructor = fieldType.getDeclaredConstructor(Channel.class);
+                                ReflectionUtils.makeAccessible(constructor);
+                                value = constructor.newInstance(channel);
+                            } catch (final NoSuchMethodException | InstantiationException | IllegalAccessException
+                                | IllegalArgumentException | InvocationTargetException e) {
+                                throw new BeanInstantiationException(fieldType,
+                                    "Failed to create gRPC client for field: " + field, e);
+                            }
+                        } else {
+                            throw new InvalidPropertyException(field.getDeclaringClass(), field.getName(),
+                                "Unsupported field type " + fieldType.getName());
+                        }
                         ReflectionUtils.makeAccessible(field);
-                        ReflectionUtils.setField(field, target, channel);
+                        ReflectionUtils.setField(field, target, value);
                     }
                 }
             }
