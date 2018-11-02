@@ -13,6 +13,7 @@ public class GrpcServerProperties {
      * Default grpc server port
      */
     public static final int DEFAULT_PORT = 6868;
+
     /**
      * Default grpc server host
      */
@@ -84,10 +85,10 @@ public class GrpcServerProperties {
     private ExecutorProperties executor;
 
     public static class ExecutorProperties {
-        private int corePoolSize;
-        private int maximumPoolSize;
-        private long keepAliveTime;
-        private int workQueueCapacity;
+        private int corePoolSize = 2;
+        private int maximumPoolSize = 4;
+        private int workQueueCapacity = 1024;
+        private long keepAliveTime = 30;
         private TimeUnit keepAliveTimeUnit = TimeUnit.SECONDS;
 
         public int getCorePoolSize() {

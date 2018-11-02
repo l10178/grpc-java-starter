@@ -5,7 +5,7 @@ import io.grpc.netty.shaded.io.grpc.netty.NegotiationType;
 
 public class GrpcClientProperties {
 
-    public static final String DEFAULT_HOST = "127.0.0.1";
+    public static final String DEFAULT_HOST = "0.0.0.0";
     public static final Integer DEFAULT_PORT = 6868;
 
     public static final GrpcClientProperties DEFAULT = new GrpcClientProperties();
