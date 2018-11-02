@@ -1,6 +1,6 @@
 package com.nxest.grpc.spring.test.server.config;
 
-import com.nxest.grpc.spring.server.GrpcServerRunner;
+import com.nxest.grpc.spring.server.*;
 import com.nxest.grpc.spring.test.config.GrpcProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +13,18 @@ public class GrpcServerConfiguration {
     @Resource
     private GrpcProperties grpcProperties;
 
-    @Bean(name = "grpcServerRunner", initMethod = "start", destroyMethod = "destroy")
-    public GrpcServerRunner serverRunner() {
-        return new GrpcServerRunner(grpcProperties.getServer());
+    @Bean
+    public GrpcServiceDiscoverer serviceDiscoverer() {
+        return new AnnotationGrpcServiceDiscoverer();
+    }
+
+    @Bean
+    public GrpcServerFactory severFactory() {
+        return new NettyGrpcServerFactory(serviceDiscoverer(), grpcProperties.getServer());
+    }
+
+    @Bean(name = "grpcServer", initMethod = "start", destroyMethod = "destroy")
+    public GrpcServer serverRunner() {
+        return severFactory().createServer();
     }
 }

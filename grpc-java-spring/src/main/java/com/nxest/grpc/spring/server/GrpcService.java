@@ -13,10 +13,10 @@ import java.lang.annotation.Target;
  * {@code GrpcService} is an annotation that is used to mark a gRPC service implementation for automatic inclusion in
  * your server.
  */
-@Service
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Service
 public @interface GrpcService {
 
     /**

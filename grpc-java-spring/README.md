@@ -33,15 +33,15 @@ Tools for automatically wiring up and starting a [gRPC][] service using Spring.
 
 主要介绍
 SSL配置：三种文件差别，生成一个证书
+thread pool
+interceptors order
 
 
 TODO:
-1. thread pool
+1. 
 2. 服务注册和发现
 3. Test interceptors
 4. ServerFactory
-
-0.0.0.0 vs 127.0.0.1 vs localhost
 
 #### Roadmap
 
