@@ -1,5 +1,9 @@
 package com.nxest.grpc.spring.server.configure;
 
+import io.grpc.internal.GrpcUtil;
+
+import java.util.concurrent.TimeUnit;
+
 /**
  * Grpc server properties
  */
@@ -9,11 +13,20 @@ public class GrpcServerProperties {
      * Default grpc server port
      */
     public static final int DEFAULT_PORT = 6868;
+    /**
+     * Default grpc server host
+     */
+    public static final String DEFAULT_HOST = "0.0.0.0";
 
     /**
      * The default  grpc server properties
      */
     public static final GrpcServerProperties DEFAULT = new GrpcServerProperties();
+
+    /**
+     * Bind address for the server. Defaults to {@code 0.0.0.0}.
+     */
+    private String address = DEFAULT_HOST;
 
     /**
      * Server port
@@ -32,10 +45,16 @@ public class GrpcServerProperties {
     private long shutdownDelayMillis = 1000L;
 
     /**
+     * The maximum message size in bytes allowed to be received by the server. If not set ({@code null}) then it will
+     * default to {@link GrpcUtil#DEFAULT_MAX_MESSAGE_SIZE DEFAULT_MAX_MESSAGE_SIZE}. If set to {@code -1} then it will
+     * use {@link Integer#MAX_VALUE} as limit.
+     */
+    private Integer maxInboundMessageSize = null;
+
+    /**
      * Enables SSL/TLS
      */
     private boolean enableSsl = true;
-
 
     /**
      * The cert chain file, eg. server.cer
@@ -62,6 +81,77 @@ public class GrpcServerProperties {
      */
     private String sslProvider = "openssl";
 
+    private ExecutorProperties executor;
+
+    public static class ExecutorProperties {
+        private int corePoolSize;
+        private int maximumPoolSize;
+        private long keepAliveTime;
+        private int workQueueCapacity;
+        private TimeUnit keepAliveTimeUnit = TimeUnit.SECONDS;
+
+        public int getCorePoolSize() {
+            return corePoolSize;
+        }
+
+        public void setCorePoolSize(int corePoolSize) {
+            this.corePoolSize = corePoolSize;
+        }
+
+        public int getMaximumPoolSize() {
+            return maximumPoolSize;
+        }
+
+        public void setMaximumPoolSize(int maximumPoolSize) {
+            this.maximumPoolSize = maximumPoolSize;
+        }
+
+        public long getKeepAliveTime() {
+            return keepAliveTime;
+        }
+
+        public void setKeepAliveTime(long keepAliveTime) {
+            this.keepAliveTime = keepAliveTime;
+        }
+
+        public int getWorkQueueCapacity() {
+            return workQueueCapacity;
+        }
+
+        public void setWorkQueueCapacity(int workQueueCapacity) {
+            this.workQueueCapacity = workQueueCapacity;
+        }
+
+        public TimeUnit getKeepAliveTimeUnit() {
+            return keepAliveTimeUnit;
+        }
+
+        public void setKeepAliveTimeUnit(TimeUnit keepAliveTimeUnit) {
+            this.keepAliveTimeUnit = keepAliveTimeUnit;
+        }
+
+
+        @Override
+        public String toString() {
+            return "ExecutorProperties{" +
+                "corePoolSize=" + corePoolSize +
+                ", maximumPoolSize=" + maximumPoolSize +
+                ", keepAliveTime=" + keepAliveTime +
+                ", workQueueCapacity=" + workQueueCapacity +
+                ", keepAliveTimeUnit=" + keepAliveTimeUnit +
+                '}';
+        }
+    }
+
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public int getPort() {
         return port;
     }
@@ -84,6 +174,22 @@ public class GrpcServerProperties {
 
     public void setShutdownDelayMillis(long shutdownDelayMillis) {
         this.shutdownDelayMillis = shutdownDelayMillis;
+    }
+
+    public Integer getMaxInboundMessageSize() {
+        return maxInboundMessageSize;
+    }
+
+    public void setMaxInboundMessageSize(Integer maxInboundMessageSize) {
+        this.maxInboundMessageSize = maxInboundMessageSize;
+    }
+
+    public boolean isEnableSsl() {
+        return enableSsl;
+    }
+
+    public void setEnableSsl(boolean enableSsl) {
+        this.enableSsl = enableSsl;
     }
 
     public String getCertChainFile() {
@@ -118,11 +224,27 @@ public class GrpcServerProperties {
         this.sslProvider = sslProvider;
     }
 
-    public boolean isEnableSsl() {
-        return enableSsl;
+    public ExecutorProperties getExecutor() {
+        return executor;
     }
 
-    public void setEnableSsl(boolean enableSsl) {
-        this.enableSsl = enableSsl;
+    public void setExecutor(ExecutorProperties executor) {
+        this.executor = executor;
+    }
+
+    @Override
+    public String toString() {
+        return "GrpcServerProperties{" +
+            "address='" + address + '\'' +
+            ", port=" + port +
+            ", enableReflection=" + enableReflection +
+            ", shutdownDelayMillis=" + shutdownDelayMillis +
+            ", maxInboundMessageSize=" + maxInboundMessageSize +
+            ", enableSsl=" + enableSsl +
+            ", certChainFile='" + certChainFile + '\'' +
+            ", privateKeyFile='" + privateKeyFile + '\'' +
+            ", trustCertCollectionFile='" + trustCertCollectionFile + '\'' +
+            ", sslProvider='" + sslProvider + '\'' +
+            '}';
     }
 }

@@ -38,6 +38,10 @@ SSL配置：三种文件差别，生成一个证书
 TODO:
 1. thread pool
 2. 服务注册和发现
+3. Test interceptors
+4. ServerFactory
+
+0.0.0.0 vs 127.0.0.1 vs localhost
 
 #### Roadmap
 
@@ -96,6 +100,8 @@ Why not spring-boot-starter
 2018-10-24 14:57:18.063  INFO 31200 --- [           main] c.n.grpc.spring.server.GrpcServerRunner  : Starting gRPC Server ...
 
 ## Troubleshooting
+
+
 
 ## Thanks
 * [salesforce/grpc-java-contrib](https://github.com/salesforce/grpc-java-contrib)

@@ -3,7 +3,9 @@ package com.nxest.grpc.spring.server;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.net.InetAddresses;
 import com.nxest.grpc.spring.server.configure.GrpcServerProperties;
+import com.nxest.grpc.spring.server.executor.GrpcDiscardPolicy;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerInterceptor;
@@ -14,6 +16,7 @@ import io.grpc.netty.shaded.io.netty.handler.ssl.ClientAuth;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider;
 import io.grpc.netty.shaded.io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.grpc.netty.shaded.io.netty.util.concurrent.DefaultThreadFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
@@ -22,11 +25,12 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.util.ResourceUtils;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,13 +80,18 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware 
         logger.info("Starting grpc Server ...");
 
         //init default server builder
-        NettyServerBuilder serverBuilder = NettyServerBuilder.forPort(grpcServerProperties.getPort());
+        NettyServerBuilder serverBuilder = NettyServerBuilder.forAddress(
+            new InetSocketAddress(InetAddresses.forString(getAddress()), getPort()));
 
         //find and bind services
         bindService(serverBuilder);
 
         //SSL/TLS supports
         initSslContext(serverBuilder);
+
+        configureMessageLimits(serverBuilder);
+
+        configureExecutorPool(serverBuilder);
 
         //add custom server configure
         serverBuilderConfigurer.configure(serverBuilder);
@@ -95,6 +104,42 @@ public class GrpcServerRunner implements AutoCloseable, ApplicationContextAware 
 
         //wait for stop
         blockUntilShutdown();
+    }
+
+    private void configureExecutorPool(NettyServerBuilder serverBuilder) {
+        GrpcServerProperties.ExecutorProperties executor = grpcServerProperties.getExecutor();
+        logger.info(format("Grpc server executor properties: %s", executor));
+
+        if (executor == null) {
+            return;
+        }
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(executor.getCorePoolSize(),
+            executor.getMaximumPoolSize(),
+            executor.getKeepAliveTime(),
+            executor.getKeepAliveTimeUnit(),
+            new LinkedBlockingQueue<>(executor.getWorkQueueCapacity()),
+            new DefaultThreadFactory("grpc-server-pool", true),
+            new GrpcDiscardPolicy()
+        );
+        serverBuilder.executor(threadPoolExecutor);
+    }
+
+
+    private int getPort() {
+        return grpcServerProperties.getPort();
+    }
+
+    private String getAddress() {
+        return grpcServerProperties.getAddress();
+    }
+
+    private void configureMessageLimits(final NettyServerBuilder builder) {
+        final Integer maxInboundMessageSize = grpcServerProperties.getMaxInboundMessageSize();
+        if (maxInboundMessageSize == null) {
+            //use default size
+            return;
+        }
+        builder.maxInboundMessageSize(maxInboundMessageSize == -1 ? Integer.MAX_VALUE : maxInboundMessageSize);
     }
 
     private void bindService(NettyServerBuilder serverBuilder) {
