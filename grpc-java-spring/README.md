@@ -12,7 +12,6 @@ Tools for automatically wiring up and starting a [gRPC][] service using Spring.
 ### gRPC server
 
 
-
 # 前期考虑
 当我接触到这样一个全新的技术的时候，在考虑什么：
 1. 能承担多少并发量,要不要做连接池，要不要做集群和负载均衡,用什么做。
@@ -25,11 +24,6 @@ Tools for automatically wiring up and starting a [gRPC][] service using Spring.
 8. 有哪些已知的坑,提前规避。
 9. 基本使用，同步/异步、单向双向
 
-我想做成什么样：
-1. 首先是根据项目需要来，先满足项目要求。先满足基本使用，并配合Spring使用，这是我们项目的基本要求。
-2. 看下别人做了什么，别人需要什么，尽可能通用，满足更多人的需求。
-3. GRPC有哪些常用配置。
-
 
 主要介绍
 SSL配置：三种文件差别，生成一个证书
@@ -39,9 +33,9 @@ interceptors order
 
 TODO:
 1. 
-2. 服务注册和发现
-3. Test interceptors
-4. ServerFactory
+
+超时处理
+
 
 #### Roadmap
 
@@ -90,17 +84,7 @@ Why not spring-boot-starter
 3. 想用在Spring Boot项目中也并不难，尽力做到用起来简单，全部都有默认项。
 
 
-//TODO:spring info 提示，bug:注入的chanel可能为null
- : Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@1a72a540: startup date [Wed Oct 24 14:57:17 CST 2018]; root of context hierarchy
-2018-10-24 14:57:17.782  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'grpcClientConfiguration' of type [com.nxest.grpc.spring.test.client.config.GrpcClientConfiguration$$EnhancerBySpringCGLIB$$8cb55dc8] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
-2018-10-24 14:57:17.821  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'grpcChannelsProperties' of type [com.nxest.grpc.spring.client.configure.GrpcChannelsProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
-2018-10-24 14:57:17.825  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'grpcLoadBalancerFactory' of type [io.grpc.util.RoundRobinLoadBalancerFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
-2018-10-24 14:57:17.830  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'clientInterceptorRegistry' of type [com.nxest.grpc.spring.client.ClientInterceptorRegistry] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
-2018-10-24 14:57:17.836  INFO 31200 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'addressChannelFactory' of type [com.nxest.grpc.spring.client.AddressChannelFactory] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
-2018-10-24 14:57:18.063  INFO 31200 --- [           main] c.n.grpc.spring.server.GrpcServerRunner  : Starting gRPC Server ...
-
 ## Troubleshooting
-
 
 
 ## Thanks
