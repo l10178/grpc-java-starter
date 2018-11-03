@@ -1,9 +1,9 @@
 package com.nxest.grpc.spring.client;
 
-import java.util.List;
-
 import io.grpc.Channel;
 import io.grpc.ClientInterceptor;
+
+import java.util.Collection;
 
 public interface GrpcChannelFactory {
 
@@ -13,5 +13,5 @@ public interface GrpcChannelFactory {
 
     Channel createChannel(String name);
 
-    Channel createChannel(String name, List<ClientInterceptor> interceptors);
+    Channel createChannel(String name, Collection<ClientInterceptor> interceptors);
 }

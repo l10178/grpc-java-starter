@@ -42,40 +42,86 @@ public class GrpcClientProperties {
     private long keepAliveTimeout = 20;
 
     /**
-     * The maximum message size in bytes allowed to be received on the channel. If not set (<tt>-2</tt>)
-     * then it will default to {@link GrpcUtil#DEFAULT_MAX_MESSAGE_SIZE DEFAULT_MAX_MESSAGE_SIZE}. If
+     * The maximum message size in bytes allowed to be received on the channel. If
      * set to <tt>-1</tt> then it will use {@link Integer#MAX_VALUE} as limit.
      */
-    private int maxInboundMessageSize = -2;
+    private Integer maxInboundMessageSize;
 
     private boolean fullStreamDecompression = false;
 
-    /**
-     * The negotiation type to use on the connection. Either of {@link NegotiationType#TLS TLS}
-     * (recommended), {@link NegotiationType#PLAINTEXT_UPGRADE PLAINTEXT_UPGRADE} or
-     * {@link NegotiationType#PLAINTEXT PLAINTEXT}.
-     */
-    private String negotiationType = NegotiationType.TLS.toString();
+    private SecurityProperties security = new SecurityProperties();
 
-    /**
-     * The cert chain file, eg. server.cer
-     * Note: certChainFile and privateKeyFile are only needed if mutual auth is desired.
-     * And if you specify certChainFile you must also specify privateKeyFile
-     */
-    private String certChainFile;
 
-    /**
-     * The private key file, eg. server.key
-     * Note: certChainFile and privateKeyFile are only needed if mutual auth is desired.
-     * And if you specify certChainFile you must also specify privateKeyFile
-     */
-    private String privateKeyFile;
+    public static class SecurityProperties {
 
-    /**
-     * The trust cert collection file, eg. ca.crt
-     */
-    private String trustCertCollectionFile;
+        /**
+         * The negotiation type to use on the connection. Either of {@link NegotiationType#TLS TLS}
+         * (recommended), {@link NegotiationType#PLAINTEXT_UPGRADE PLAINTEXT_UPGRADE} or
+         * {@link NegotiationType#PLAINTEXT PLAINTEXT}.
+         */
+        private String negotiationType = NegotiationType.TLS.toString();
 
+        /**
+         * The cert chain file, eg. server.cer
+         * Note: certChainFile and privateKeyFile are only needed if mutual auth is desired.
+         * And if you specify certChainFile you must also specify privateKeyFile
+         */
+        private String certChainFile;
+
+        /**
+         * The private key file, eg. server.key
+         * Note: certChainFile and privateKeyFile are only needed if mutual auth is desired.
+         * And if you specify certChainFile you must also specify privateKeyFile
+         */
+        private String privateKeyFile;
+
+        /**
+         * The trust cert collection file, eg. ca.crt
+         */
+        private String trustCertCollectionFile;
+
+        public String getNegotiationType() {
+            return negotiationType;
+        }
+
+        public void setNegotiationType(String negotiationType) {
+            this.negotiationType = negotiationType;
+        }
+
+        public String getCertChainFile() {
+            return certChainFile;
+        }
+
+        public void setCertChainFile(String certChainFile) {
+            this.certChainFile = certChainFile;
+        }
+
+        public String getPrivateKeyFile() {
+            return privateKeyFile;
+        }
+
+        public void setPrivateKeyFile(String privateKeyFile) {
+            this.privateKeyFile = privateKeyFile;
+        }
+
+        public String getTrustCertCollectionFile() {
+            return trustCertCollectionFile;
+        }
+
+        public void setTrustCertCollectionFile(String trustCertCollectionFile) {
+            this.trustCertCollectionFile = trustCertCollectionFile;
+        }
+
+        @Override
+        public String toString() {
+            return "SecurityProperties{" +
+                "negotiationType='" + negotiationType + '\'' +
+                ", certChainFile='" + certChainFile + '\'' +
+                ", privateKeyFile='" + privateKeyFile + '\'' +
+                ", trustCertCollectionFile='" + trustCertCollectionFile + '\'' +
+                '}';
+        }
+    }
 
     public String getHost() {
         return host;
@@ -125,11 +171,11 @@ public class GrpcClientProperties {
         this.keepAliveTimeout = keepAliveTimeout;
     }
 
-    public int getMaxInboundMessageSize() {
+    public Integer getMaxInboundMessageSize() {
         return maxInboundMessageSize;
     }
 
-    public void setMaxInboundMessageSize(int maxInboundMessageSize) {
+    public void setMaxInboundMessageSize(Integer maxInboundMessageSize) {
         this.maxInboundMessageSize = maxInboundMessageSize;
     }
 
@@ -141,35 +187,11 @@ public class GrpcClientProperties {
         this.fullStreamDecompression = fullStreamDecompression;
     }
 
-    public String getNegotiationType() {
-        return negotiationType;
+    public SecurityProperties getSecurity() {
+        return security;
     }
 
-    public void setNegotiationType(String negotiationType) {
-        this.negotiationType = negotiationType;
-    }
-
-    public String getCertChainFile() {
-        return certChainFile;
-    }
-
-    public void setCertChainFile(String certChainFile) {
-        this.certChainFile = certChainFile;
-    }
-
-    public String getPrivateKeyFile() {
-        return privateKeyFile;
-    }
-
-    public void setPrivateKeyFile(String privateKeyFile) {
-        this.privateKeyFile = privateKeyFile;
-    }
-
-    public String getTrustCertCollectionFile() {
-        return trustCertCollectionFile;
-    }
-
-    public void setTrustCertCollectionFile(String trustCertCollectionFile) {
-        this.trustCertCollectionFile = trustCertCollectionFile;
+    public void setSecurity(SecurityProperties security) {
+        this.security = security;
     }
 }

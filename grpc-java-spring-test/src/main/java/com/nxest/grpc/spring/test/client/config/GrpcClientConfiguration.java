@@ -2,7 +2,6 @@ package com.nxest.grpc.spring.test.client.config;
 
 import com.nxest.grpc.spring.client.*;
 import com.nxest.grpc.spring.client.configure.GrpcClientProperties;
-import com.nxest.grpc.spring.server.GrpcServerRunner;
 import com.nxest.grpc.spring.test.config.GrpcProperties;
 import com.nxest.grpc.spring.test.server.config.GrpcServerConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -24,10 +23,6 @@ public class GrpcClientConfiguration {
         return grpcProperties.getClient();
     }
 
-    @Bean
-    public ClientInterceptorRegistry clientInterceptorRegistry() {
-        return new ClientInterceptorRegistry();
-    }
 
     @Bean
     public GrpcChannelFactory channelFactory() {
@@ -35,8 +30,13 @@ public class GrpcClientConfiguration {
     }
 
     @Bean
+    public GrpcClientInterceptorDiscoverer clientInterceptorDiscoverer() {
+        return new AnnotationClientInterceptorDiscoverer();
+    }
+
+    @Bean
     @ConditionalOnClass(GrpcClient.class)
     public GrpcClientBeanPostProcessor grpcClientBeanPostProcessor() {
-        return new GrpcClientBeanPostProcessor(channelFactory(), clientInterceptorRegistry());
+        return new GrpcClientBeanPostProcessor(channelFactory(), clientInterceptorDiscoverer());
     }
 }

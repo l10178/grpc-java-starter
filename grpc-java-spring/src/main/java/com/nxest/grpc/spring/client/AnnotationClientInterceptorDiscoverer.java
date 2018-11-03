@@ -3,6 +3,7 @@ package com.nxest.grpc.spring.client;
 import com.google.common.collect.Lists;
 import io.grpc.ClientInterceptor;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -14,25 +15,15 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
-/**
- * 全局的客户端Interceptor
- */
-public class ClientInterceptorRegistry implements ApplicationContextAware, InitializingBean {
+public class AnnotationClientInterceptorDiscoverer implements ApplicationContextAware, InitializingBean, GrpcClientInterceptorDiscoverer {
 
     private final List<ClientInterceptor> clientInterceptors = Lists.newArrayList();
-    private ApplicationContext applicationContext;
 
-    public void addClientInterceptors(List<ClientInterceptor> interceptors) {
-        clientInterceptors.addAll(interceptors);
-    }
+    private ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-    }
-
-    public List<ClientInterceptor> getClientInterceptors() {
-        return clientInterceptors;
     }
 
     @Override
@@ -53,13 +44,33 @@ public class ClientInterceptorRegistry implements ApplicationContextAware, Initi
             .stream()
             .map(s -> (ClientInterceptor) s)
             .collect(Collectors.toList());
-        addClientInterceptors(interceptors);
+        clientInterceptors.addAll(interceptors);
     }
 
-    public ClientInterceptor getClientInterceptorBean(Class<? extends ClientInterceptor> clientInterceptorClass) {
-        if (applicationContext.getBeanNamesForType(ClientInterceptor.class).length > 0) {
-            return applicationContext.getBean(clientInterceptorClass);
+    @Override
+    public Collection<ClientInterceptor> findGrpcClientInterceptors(GrpcClient annotation) {
+
+        List<ClientInterceptor> clientInterceptors = Lists.newArrayList();
+
+        for (Class<? extends ClientInterceptor> clientInterceptorClass : annotation.interceptors()) {
+            ClientInterceptor clientInterceptor = applicationContext.getBean(clientInterceptorClass);
+            if (clientInterceptor == null) {
+                try {
+                    clientInterceptor = clientInterceptorClass.newInstance();
+                } catch (Exception e) {
+                    throw new BeanCreationException("Failed to create client interceptor instance", e);
+                }
+            }
+            clientInterceptors.add(clientInterceptor);
         }
-        return null;
+
+        if (annotation.applyGlobalInterceptors()) {
+            clientInterceptors.addAll(globalClientInterceptorsWithAnnotation());
+        }
+        return clientInterceptors;
+    }
+
+    private List<ClientInterceptor> globalClientInterceptorsWithAnnotation() {
+        return clientInterceptors;
     }
 }
