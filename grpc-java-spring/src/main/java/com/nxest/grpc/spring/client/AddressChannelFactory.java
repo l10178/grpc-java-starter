@@ -102,7 +102,7 @@ public class AddressChannelFactory implements GrpcChannelFactory, DisposableBean
         }
     }
 
-    protected void configureCompression(final NettyChannelBuilder builder) {
+    private void configureCompression(final NettyChannelBuilder builder) {
         if (properties.isFullStreamDecompression()) {
             builder.enableFullStreamDecompression();
         }
