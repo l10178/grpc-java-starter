@@ -19,14 +19,14 @@ public class GrpcClientConfiguration {
     private GrpcProperties grpcProperties;
 
     @Bean
-    public GrpcClientProperties grpcChannelProperties() {
+    public GrpcClientProperties clientProperties() {
         return grpcProperties.getClient();
     }
 
 
     @Bean
     public GrpcChannelFactory channelFactory() {
-        return new AddressChannelFactory(grpcChannelProperties());
+        return new AddressChannelFactory(clientProperties());
     }
 
     @Bean
