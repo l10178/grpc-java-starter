@@ -13,6 +13,7 @@ before_install:
 install:
   - "echo skipped"
 script:
+  - cd grpc-java-spring
   - mvn clean package
 after_success:
   - "echo skipped"
