@@ -88,12 +88,12 @@ public class GrpcServer extends Server implements AutoCloseable, DisposableBean 
     }
 
     /**
-     * Gets the address the created server will be bound to.
+     * Gets the host the created server will be bound to.
      *
-     * @return The address the server will be bound to.
+     * @return The host the server will be bound to.
      */
-    public String getAddress() {
-        return properties.getAddress();
+    public String getHost() {
+        return properties.getHost();
     }
 
 

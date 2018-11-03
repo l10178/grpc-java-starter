@@ -8,10 +8,10 @@ import java.lang.annotation.*;
  * {@code GrpcServerInterceptor} is an annotation that is used to mark a gRPC ServerInterceptor implementation for automatic inclusion in
  * your server, it's a global interceptor.
  */
-@Service
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Service
 public @interface GrpcServerInterceptor {
 
     /**

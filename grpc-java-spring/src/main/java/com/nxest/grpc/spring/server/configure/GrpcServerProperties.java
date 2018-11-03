@@ -25,9 +25,9 @@ public class GrpcServerProperties {
     public static final GrpcServerProperties DEFAULT = new GrpcServerProperties();
 
     /**
-     * Bind address for the server. Defaults to {@code 0.0.0.0}.
+     * Bind host for the server. Defaults to {@code 0.0.0.0}.
      */
-    private String address = DEFAULT_HOST;
+    private String host = DEFAULT_HOST;
 
     /**
      * Server port
@@ -198,12 +198,12 @@ public class GrpcServerProperties {
     }
 
 
-    public String getAddress() {
-        return address;
+    public String getHost() {
+        return host;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public int getPort() {

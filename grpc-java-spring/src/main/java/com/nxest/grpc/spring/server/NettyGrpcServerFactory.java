@@ -56,7 +56,7 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
 
         //init default server builder
         NettyServerBuilder serverBuilder = NettyServerBuilder.forAddress(
-            new InetSocketAddress(InetAddresses.forString(properties.getAddress()), properties.getPort()));
+            new InetSocketAddress(InetAddresses.forString(properties.getHost()), properties.getPort()));
 
         //find and bind services
         configureServices(serverBuilder);

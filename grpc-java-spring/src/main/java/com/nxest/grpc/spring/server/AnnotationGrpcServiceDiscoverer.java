@@ -19,6 +19,10 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
+/**
+ * Find {@link ServerInterceptor} with annotation {@link GrpcService} and bind interceptors.
+ *
+ */
 public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware, GrpcServiceDiscoverer {
 
     private static final Logger logger = Logger.getLogger(AnnotationGrpcServiceDiscoverer.class.getName());
