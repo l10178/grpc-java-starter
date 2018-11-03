@@ -1,14 +1,12 @@
 package com.nxest.grpc.spring.server;
 
 import com.google.common.collect.Lists;
-import io.grpc.BindableService;
-import io.grpc.ServerInterceptor;
-import io.grpc.ServerInterceptors;
-import io.grpc.ServerServiceDefinition;
+import io.grpc.*;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,7 +19,6 @@ import static java.lang.String.format;
 
 /**
  * Find {@link ServerInterceptor} with annotation {@link GrpcService} and bind interceptors.
- *
  */
 public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware, GrpcServiceDiscoverer {
 
@@ -40,7 +37,7 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware,
             Arrays.asList(this.applicationContext.getBeanNamesForAnnotation(GrpcService.class));
         List<GrpcServiceDefinition> definitions = Lists.newArrayListWithCapacity(beanNames.size());
 
-        List<ServerInterceptor> globalInterceptorList = getServerInterceptorsWithAnnotation();
+        List<ServerInterceptor> globalInterceptorList = globalInterceptorsWithAnnotation();
         for (String beanName : beanNames) {
             BindableService bindableService = this.applicationContext.getBean(beanName, BindableService.class);
             ServerServiceDefinition serviceDefinition = bindableService.bindService();
@@ -80,7 +77,7 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware,
     }
 
 
-    protected List<ServerInterceptor> getServerInterceptorsWithAnnotation() {
+    private List<ServerInterceptor> globalInterceptorsWithAnnotation() {
         Map<String, Object> possibleInterceptors = applicationContext.getBeansWithAnnotation(GrpcServerInterceptor.class);
 
         Collection<String> invalidInterceptors = possibleInterceptors.entrySet().stream()
@@ -95,7 +92,14 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware,
         }
 
         return possibleInterceptors.values().stream()
-            .map(s -> (ServerInterceptor) s).collect(Collectors.toList());
+            .map(s -> (ServerInterceptor) s)
+            .filter(this::filterGlobalInterceptor)
+            .collect(Collectors.toList());
+    }
+
+    private boolean filterGlobalInterceptor(ServerInterceptor interceptor) {
+        GrpcServerInterceptor annotation = AnnotationUtils.getAnnotation(interceptor.getClass(), GrpcServerInterceptor.class);
+        return annotation.global();
     }
 
 }

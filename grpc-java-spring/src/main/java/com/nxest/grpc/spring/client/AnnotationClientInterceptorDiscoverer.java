@@ -7,6 +7,7 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,8 +44,14 @@ public class AnnotationClientInterceptorDiscoverer implements ApplicationContext
         List<ClientInterceptor> interceptors = possibleInterceptors.values()
             .stream()
             .map(s -> (ClientInterceptor) s)
+            .filter(this::filterGlobalInterceptor)
             .collect(Collectors.toList());
         clientInterceptors.addAll(interceptors);
+    }
+
+    private boolean filterGlobalInterceptor(ClientInterceptor interceptor) {
+        GrpcClientInterceptor annotation = AnnotationUtils.getAnnotation(interceptor.getClass(), GrpcClientInterceptor.class);
+        return annotation.global();
     }
 
     @Override

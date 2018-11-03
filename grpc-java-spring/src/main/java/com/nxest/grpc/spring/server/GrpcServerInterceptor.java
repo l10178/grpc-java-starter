@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 
 /**
  * {@code GrpcServerInterceptor} is an annotation that is used to mark a gRPC ServerInterceptor implementation for automatic inclusion in
- * your server, it's a global interceptor.
+ * your server, by default it's a global interceptor.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -20,4 +20,11 @@ public @interface GrpcServerInterceptor {
      * @return the suggested component name, if any
      */
     String value() default "";
+
+    /**
+     * if is a global interceptors
+     *
+     * @return if is a global interceptors
+     */
+    boolean global() default true;
 }
