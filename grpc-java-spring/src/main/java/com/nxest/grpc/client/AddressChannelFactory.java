@@ -138,6 +138,11 @@ public class AddressChannelFactory implements GrpcChannelFactory, DisposableBean
             String privateKeyFile = security.getPrivateKeyFile();
             SslContextBuilder sslContextBuilder = GrpcSslContexts.forClient();
 
+            final String authorityOverwrite = security.getAuthorityOverride();
+            if (authorityOverwrite != null) {
+                builder.overrideAuthority(authorityOverwrite);
+            }
+
             if (trustCertCollectionFile != null) {
                 sslContextBuilder.trustManager(ResourceUtils.getURL(trustCertCollectionFile).openStream());
             } else {

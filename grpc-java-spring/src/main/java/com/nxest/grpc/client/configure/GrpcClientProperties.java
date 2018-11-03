@@ -79,6 +79,12 @@ public class GrpcClientProperties {
          */
         private String trustCertCollectionFile;
 
+        /**
+         * The authority to check for during certificate checks. By default the clients will use the name of the client
+         * to check the server certificate's common + alternative names.
+         */
+        private String authorityOverride = null;
+
         public String getNegotiationType() {
             return negotiationType;
         }
@@ -111,6 +117,14 @@ public class GrpcClientProperties {
             this.trustCertCollectionFile = trustCertCollectionFile;
         }
 
+        public String getAuthorityOverride() {
+            return authorityOverride;
+        }
+
+        public void setAuthorityOverride(String authorityOverride) {
+            this.authorityOverride = authorityOverride;
+        }
+
         @Override
         public String toString() {
             return "SecurityProperties{" +
@@ -118,6 +132,7 @@ public class GrpcClientProperties {
                 ", certChainFile='" + certChainFile + '\'' +
                 ", privateKeyFile='" + privateKeyFile + '\'' +
                 ", trustCertCollectionFile='" + trustCertCollectionFile + '\'' +
+                ", authorityOverride='" + authorityOverride + '\'' +
                 '}';
         }
     }
