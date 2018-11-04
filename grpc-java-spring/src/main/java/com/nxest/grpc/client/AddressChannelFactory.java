@@ -139,11 +139,11 @@ public class AddressChannelFactory implements GrpcChannelFactory, DisposableBean
             SslContextBuilder sslContextBuilder = GrpcSslContexts.forClient();
 
             final String authorityOverwrite = security.getAuthorityOverride();
-            if (authorityOverwrite != null) {
+            if (!Strings.isNullOrEmpty(authorityOverwrite)) {
                 builder.overrideAuthority(authorityOverwrite);
             }
 
-            if (trustCertCollectionFile != null) {
+            if (!Strings.isNullOrEmpty(trustCertCollectionFile)) {
                 sslContextBuilder.trustManager(ResourceUtils.getURL(trustCertCollectionFile).openStream());
             } else {
                 sslContextBuilder.trustManager(InsecureTrustManagerFactory.INSTANCE);
@@ -153,7 +153,7 @@ public class AddressChannelFactory implements GrpcChannelFactory, DisposableBean
              *Note: certChainFile and privateKeyFile are only needed if mutual auth is desired.
              *And if you specify certChainFile you must also specify privateKeyFile
              */
-            if (certChainFile != null && privateKeyFile != null) {
+            if (!Strings.isNullOrEmpty(certChainFile) && !Strings.isNullOrEmpty(privateKeyFile)) {
                 sslContextBuilder.keyManager(ResourceUtils.getURL(certChainFile).openStream(), ResourceUtils.getURL(privateKeyFile).openStream());
             }
 
