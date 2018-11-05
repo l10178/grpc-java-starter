@@ -4,23 +4,23 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!--settings for release to maven central-->
-<parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>9</version>
-</parent>
-<scm>
-    <tag>master</tag>
-    <url>git@github.com:l10178/grpc-java-starter.git</url>
-    <connection>scm:git:git@github.com:l10178/grpc-java-starter.git</connection>
-    <developerConnection>scm:git:git@github.com:l10178/grpc-java-starter.git</developerConnection>
-</scm>
-<developers>
-    <developer>
-        <name>l10178</name>
-        <email>l10178@163.com</email>
-    </developer>
-</developers>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+    </parent>
+    <scm>
+        <tag>master</tag>
+        <url>git@github.com:l10178/grpc-java-starter.git</url>
+        <connection>scm:git:git@github.com:l10178/grpc-java-starter.git</connection>
+        <developerConnection>scm:git:git@github.com:l10178/grpc-java-starter.git</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <name>l10178</name>
+            <email>l10178@163.com</email>
+        </developer>
+    </developers>
 
     <groupId>com.nxest.grpc</groupId>
     <artifactId>grpc-java-spring</artifactId>
