@@ -73,9 +73,6 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
             configurer.configure(serverBuilder);
         }
 
-        //init the server
-        serverBuilder.build();
-
         return new GrpcServer(serverBuilder.build(), properties);
     }
 
