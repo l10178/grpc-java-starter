@@ -125,11 +125,9 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
         }
 
         try {
-            logger.info("Begin init grpc server SSL/TLS.");
+            logger.info(format("Begin init grpc server SSL/TLS. %s.", security));
             String certChainFile = security.getCertChainFile();
             String privateKeyFile = security.getPrivateKeyFile();
-            logger.info(format("Grpc server SSL/TLS certChainFile is %s.", certChainFile));
-            logger.info(format("Grpc server SSL/TLS privateKeyFile is %s.", privateKeyFile));
 
             SslContextBuilder sslClientContextBuilder;
             if (Strings.isNullOrEmpty(certChainFile) || Strings.isNullOrEmpty(certChainFile)) {
@@ -143,7 +141,6 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
 
             // You only need to supply trustCertCollectionFile if you want to enable Mutual TLS.
             String trustCertCollectionFile = security.getTrustCertCollectionFile();
-            logger.info(format("Grpc server SSL/TLS trustCertCollectionFile is %s.", trustCertCollectionFile));
 
             if (!Strings.isNullOrEmpty(trustCertCollectionFile)) {
                 sslClientContextBuilder.trustManager(ResourceUtils.getURL(trustCertCollectionFile).openStream());
