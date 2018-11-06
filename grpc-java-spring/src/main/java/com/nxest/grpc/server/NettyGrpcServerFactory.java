@@ -92,7 +92,7 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
         GrpcServerProperties.ExecutorProperties executor = properties.getExecutor();
         logger.info(format("Grpc server executor properties: %s", executor));
         if (executor == null) {
-            logger.info("Grpc server ThreadPoolExecutor is null. This is not recommended.");
+            logger.warning("Grpc server ThreadPoolExecutor is null. This is not recommended.");
             return;
         }
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(executor.getCorePoolSize(),
