@@ -146,7 +146,7 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
             String privateKeyFile = security.getPrivateKeyFile();
 
             SslContextBuilder sslClientContextBuilder;
-            if (Strings.isNullOrEmpty(certChainFile) || Strings.isNullOrEmpty(certChainFile)) {
+            if (Strings.isNullOrEmpty(certChainFile) || Strings.isNullOrEmpty(privateKeyFile)) {
                 logger.warning("Grpc server SSL/TLS certChainFile or privateKeyFile  is empty,use default SelfSignedCertificate.");
                 SelfSignedCertificate ssc = new SelfSignedCertificate();
                 sslClientContextBuilder = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey());
