@@ -12,7 +12,6 @@ import io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider;
 import io.grpc.netty.shaded.io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.grpc.netty.shaded.io.netty.util.concurrent.DefaultThreadFactory;
 import org.springframework.util.ResourceUtils;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
