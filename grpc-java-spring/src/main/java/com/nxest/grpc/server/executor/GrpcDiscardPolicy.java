@@ -1,6 +1,5 @@
 package com.nxest.grpc.server.executor;
 
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Logger;
 
@@ -8,7 +7,7 @@ import java.util.logging.Logger;
  * A handler for rejected tasks that silently discards the
  * rejected task.
  */
-public class GrpcDiscardPolicy implements RejectedExecutionHandler {
+public class GrpcDiscardPolicy extends ThreadPoolExecutor.DiscardPolicy {
 
     private static final Logger logger = Logger.getLogger(GrpcDiscardPolicy.class.getName());
 

@@ -12,12 +12,14 @@ import io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider;
 import io.grpc.netty.shaded.io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.grpc.netty.shaded.io.netty.util.concurrent.DefaultThreadFactory;
 import org.springframework.util.ResourceUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Logger;
 
@@ -89,8 +91,8 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
     private void configureExecutorPool(final NettyServerBuilder serverBuilder) {
         GrpcServerProperties.ExecutorProperties executor = properties.getExecutor();
         logger.info(format("Grpc server executor properties: %s", executor));
-
         if (executor == null) {
+            logger.info("Grpc server ThreadPoolExecutor is null. This is not recommended.");
             return;
         }
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(executor.getCorePoolSize(),
@@ -99,9 +101,26 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
             executor.getKeepAliveTimeUnit(),
             new LinkedBlockingQueue<>(executor.getWorkQueueCapacity()),
             new DefaultThreadFactory("grpc-server-pool", true),
-            new GrpcDiscardPolicy()
+            rejectedPolicy(executor.getRejectedPolicy())
         );
         serverBuilder.executor(threadPoolExecutor);
+    }
+
+    private RejectedExecutionHandler rejectedPolicy(String rejectedPolicy) {
+
+        if (Strings.isNullOrEmpty(rejectedPolicy) || "Discard".equalsIgnoreCase(rejectedPolicy)) {
+            return new GrpcDiscardPolicy();
+        }
+        if ("DiscardOldest".equalsIgnoreCase(rejectedPolicy)) {
+            return new ThreadPoolExecutor.DiscardOldestPolicy();
+        }
+        if ("Abort".equalsIgnoreCase(rejectedPolicy)) {
+            return new ThreadPoolExecutor.AbortPolicy();
+        }
+        if ("CallerRuns".equalsIgnoreCase(rejectedPolicy)) {
+            return new ThreadPoolExecutor.CallerRunsPolicy();
+        }
+        throw new IllegalArgumentException("Illegal argument: rejectedPolicy should be Discard,DiscardOldest,Abort or CallerRuns");
     }
 
     private void configureMessageLimits(final NettyServerBuilder builder) {

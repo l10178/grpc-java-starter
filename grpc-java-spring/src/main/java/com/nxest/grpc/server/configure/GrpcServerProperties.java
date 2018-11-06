@@ -143,6 +143,7 @@ public class GrpcServerProperties {
         private int workQueueCapacity = 1024;
         private long keepAliveTime = 30;
         private TimeUnit keepAliveTimeUnit = TimeUnit.SECONDS;
+        private String rejectedPolicy = "Discard";
 
         public int getCorePoolSize() {
             return corePoolSize;
@@ -184,15 +185,23 @@ public class GrpcServerProperties {
             this.keepAliveTimeUnit = keepAliveTimeUnit;
         }
 
+        public String getRejectedPolicy() {
+            return rejectedPolicy;
+        }
+
+        public void setRejectedPolicy(String rejectedPolicy) {
+            this.rejectedPolicy = rejectedPolicy;
+        }
 
         @Override
         public String toString() {
             return "ExecutorProperties{" +
                 "corePoolSize=" + corePoolSize +
                 ", maximumPoolSize=" + maximumPoolSize +
-                ", keepAliveTime=" + keepAliveTime +
                 ", workQueueCapacity=" + workQueueCapacity +
+                ", keepAliveTime=" + keepAliveTime +
                 ", keepAliveTimeUnit=" + keepAliveTimeUnit +
+                ", rejectedPolicy='" + rejectedPolicy + '\'' +
                 '}';
         }
     }
