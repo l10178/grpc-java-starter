@@ -22,10 +22,10 @@ Add a dependency using Maven:
 ```
 
 ### gRPC server
-See demo: [l10178/grpc-java-starter](https://github.com/l10178/grpc-java-starter/tree/master/grpc-java-spring-test)
+See demo: [l10178/grpc-java-spring-test](https://github.com/l10178/grpc-java-starter/tree/master/grpc-java-spring-test)
 
 ### gRPC client
-See demo: [l10178/grpc-java-starter](https://github.com/l10178/grpc-java-starter/tree/master/grpc-java-spring-test)
+See demo: [l10178/grpc-java-spring-test](https://github.com/l10178/grpc-java-starter/tree/master/grpc-java-spring-test)
 
 ## Troubleshooting
 
