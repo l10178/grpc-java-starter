@@ -1,0 +1,37 @@
+{
+    "package": {
+        "subject": "l10178",
+        "repo": "maven",
+        "name": "${project.artifactId}",
+        "desc": "${project.description}",
+        "website_url": "https://github.com/l10178/grpc-java-starter",
+        "issue_tracker_url": "https://github.com/l10178/grpc-java-starter/issues",
+        "vcs_url": "https://github.com/l10178/grpc-java-starter.git",
+        "licenses": [
+            "MIT"
+        ],
+        "labels": [
+            "gRPC",
+            "Java",
+            "Spring"
+        ],
+        "public_download_numbers": true,
+        "public_stats": true
+    },
+    "version": {
+        "name": "${project.version}",
+        "released": "${timestamp}",
+        "vcs_tag": "${project.version}"
+    },
+    "files": [
+        {
+            "includePattern": "${project.build.directory}/(.*\\.jar)",
+            "uploadPattern": "com/nxest/grpc/${project.artifactId}/${project.version}/$1"
+        },
+        {
+            "includePattern": "${project.basedir}/pom.xml",
+            "uploadPattern": "com/nxest/grpc/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.pom"
+        }
+    ],
+    "publish": true
+}
