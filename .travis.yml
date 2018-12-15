@@ -6,14 +6,23 @@ branches:
   - master
 cache:
   directories:
-  - .autoconf
   - $HOME/.m2
 before_install:
-  - "echo skipped"
+  - export TRAVIS_TAG=$(git tag --points-at HEAD)
 install:
-  - "echo skipped"
+  - "echo skipped install"
 script:
   - cd grpc-java-spring
   - mvn clean package
 after_success:
-  - "echo skipped"
+  - "echo skipped after_success"
+before_deploy:
+  - "echo skipped before_deploy"
+deploy:
+    provider: bintray
+    skip_cleanup: true
+    file: target/.bintray.json
+    user: l10178
+    key: $BINTRAY_API_KEY
+    on:
+      tags: true
