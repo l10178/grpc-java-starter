@@ -8,6 +8,7 @@ cache:
   directories:
   - $HOME/.m2
 before_install:
+  # export TRAVIS_TAG is very import. Or the 'on tags: true' will not eff 
   - export TRAVIS_TAG=$(git tag --points-at HEAD)
 install:
   - "echo skipped install"
@@ -21,7 +22,7 @@ before_deploy:
 deploy:
     provider: bintray
     skip_cleanup: true
-    file: target/.bintray.json
+    file: grpc-java-spring/target/.bintray.json
     user: l10178
     key: $BINTRAY_API_KEY
     on:
