@@ -22,7 +22,7 @@ before_deploy:
 deploy:
     provider: bintray
     skip_cleanup: true
-    file: grpc-java-spring/target/.bintray.json
+    file: target/.bintray.json
     user: l10178
     key: $BINTRAY_API_KEY
     on:
