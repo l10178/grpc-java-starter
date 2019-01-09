@@ -9,6 +9,7 @@
     <packaging>jar</packaging>
     <name>grpc-java-spring</name>
     <description>Tools for automatically wiring up and starting a gRPC service using Spring.</description>
+    <url>https://github.com/l10178/grpc-java-starter</url>
     <licenses>
         <license>
             <name>MIT License</name>
