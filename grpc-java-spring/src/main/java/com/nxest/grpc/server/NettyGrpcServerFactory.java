@@ -17,9 +17,11 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.cert.CertificateException;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import static java.lang.String.format;
@@ -68,6 +70,8 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
         configureMessageLimits(serverBuilder);
 
         configureExecutorPool(serverBuilder);
+
+        configureKeepAliveStrategy(serverBuilder);
 
         //add custom server configure
         if (configurer != null) {
@@ -177,5 +181,12 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
             return SslProvider.OPENSSL;
         }
         return SslProvider.valueOf(sslProvider.toUpperCase());
+    }
+
+    private void configureKeepAliveStrategy(NettyServerBuilder serverBuilder) {
+        if (Objects.nonNull(properties.getPermitKeepAliveWithoutCalls()))
+            serverBuilder.permitKeepAliveWithoutCalls(properties.getPermitKeepAliveWithoutCalls());
+        if (Objects.nonNull(properties.getPermitKeepAliveTimeInSeconds()))
+            serverBuilder.permitKeepAliveTime(properties.getPermitKeepAliveTimeInSeconds(), TimeUnit.SECONDS);
     }
 }

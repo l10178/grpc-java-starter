@@ -51,6 +51,17 @@ public class GrpcServerProperties {
 
     private ExecutorProperties executor;
 
+    /**
+     * This argument if set to {{@code True}}, allows keep-alive pings to be sent even if there are no calls in flight.
+     */
+    private Boolean permitKeepAliveWithoutCalls;
+
+    /**
+     * This argument controls the minimum time (in seconds) that gRPC Core would expect between receiving successive pings.
+     * If the time between successive pings is less that than this time, then the ping will be considered a bad ping from the peer.
+     * Such a ping counts as a ‘ping strike’.
+     */
+    private Long permitKeepAliveTimeInSeconds;
 
     public static class SecurityProperties {
 
@@ -253,5 +264,21 @@ public class GrpcServerProperties {
 
     public void setExecutor(ExecutorProperties executor) {
         this.executor = executor;
+    }
+
+    public Boolean getPermitKeepAliveWithoutCalls() {
+        return permitKeepAliveWithoutCalls;
+    }
+
+    public void setPermitKeepAliveWithoutCalls(Boolean permitKeepAliveWithoutCalls) {
+        this.permitKeepAliveWithoutCalls = permitKeepAliveWithoutCalls;
+    }
+
+    public Long getPermitKeepAliveTimeInSeconds() {
+        return permitKeepAliveTimeInSeconds;
+    }
+
+    public void setPermitKeepAliveTimeInSeconds(Long permitKeepAliveTimeInSeconds) {
+        this.permitKeepAliveTimeInSeconds = permitKeepAliveTimeInSeconds;
     }
 }
