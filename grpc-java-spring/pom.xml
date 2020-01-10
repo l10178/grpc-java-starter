@@ -5,7 +5,7 @@
 
     <groupId>com.nxest.grpc</groupId>
     <artifactId>grpc-java-spring</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <packaging>jar</packaging>
     <name>grpc-java-spring</name>
     <description>Tools for automatically wiring up and starting a gRPC service using Spring.</description>
